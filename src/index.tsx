@@ -1,1 +1,3 @@
 console.log('aaa');
+
+export {};
