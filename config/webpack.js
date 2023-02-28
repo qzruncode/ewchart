@@ -1,4 +1,5 @@
 const WebpackBar = require('webpackbar');
+const nodeExternals = require('webpack-node-externals');
 const path = require('path');
 
 const config = {
@@ -116,5 +117,6 @@ const config = {
       },
     ],
   },
+  externals: [nodeExternals({ allowlist: 'd3' })],
 };
 module.exports = config;
