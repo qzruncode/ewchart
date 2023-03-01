@@ -1,13 +1,12 @@
 import React from 'react';
 
-export enum ChartType {
-  Line = 'line',
-  AreaLine = 'arealine',
-  Pie = 'pie',
-  Histogram = 'histogram',
-  Scatter = 'scatter',
-  Path = 'path',
-  CurveLine = 'curveline',
+export interface Igroup {
+  color?: string;
+  lineType: 'dotted' | 'solid';
+  label: string;
+  break: 'line' | 'none';
+  breakType?: 'dotted' | 'solid';
+  values: Array<number | null>;
 }
 
 export interface IEWChartProps {
@@ -34,12 +33,7 @@ export interface IEWChartProps {
       end: number;
     };
     yUnit: 'K' | string;
-    groups: Array<{
-      color?: string;
-      lineType: 'dotted' | 'solid';
-      label: string;
-      values: number[];
-    }>;
+    groups: Array<Igroup>;
   };
 }
 
