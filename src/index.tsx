@@ -7,12 +7,17 @@ export const ConfigContext = React.createContext(defaultConfig);
 
 function EWChart(props: IEWChartProps) {
   const chartRef = useRef(null);
+  const [chartConfig, setChartConfig] = useState(defaultConfig);
+
+  useEffect(() => {
+    setChartConfig(Object.assign(chartConfig, props.size, { width: getChartWidth() }));
+  }, []);
 
   const getChart = () => {
     const chart = props.chart;
     switch (chart.type) {
       case 'line':
-        return <LineChart />;
+        return <LineChart data={props.data} />;
       default:
         return null;
     }
@@ -28,9 +33,7 @@ function EWChart(props: IEWChartProps) {
 
   return (
     <div ref={chartRef}>
-      <ConfigContext.Provider value={Object.assign(defaultConfig, props.size, { width: getChartWidth() })}>
-        {getChart()}
-      </ConfigContext.Provider>
+      <ConfigContext.Provider value={chartConfig}>{getChart()}</ConfigContext.Provider>
     </div>
   );
 }

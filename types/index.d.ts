@@ -22,6 +22,14 @@ export interface IEWChartProps {
     bottom: number;
     left: number;
   };
+
+  data: {
+    x: {
+      start: number;
+      end: number;
+      interval: number;
+    };
+  };
 }
 
 function EWChart(props: IEWChartProps): React.ReactElement;
