@@ -1,15 +1,32 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ConfigContext } from '..';
-import { drawXAixs } from '../toolkit/axis';
+import { DrawXAixs, DrawYAixs } from '../toolkit/axis';
+import { DrawLine } from '../toolkit/line';
 
-function LineChart({ data }) {
+function LineChart({ data, id }) {
   const svgRef = useRef(null);
   const config = useContext(ConfigContext);
+  const [chartConfig, setChartConfig] = useState(config);
+
   useEffect(() => {
-    svgRef.current && drawXAixs(svgRef.current, config, data);
+    const box = document.querySelector(`.${id}`)?.parentElement;
+    setTimeout(() => {
+      const w = box ? Number(getComputedStyle(box).width.slice(0, -2)) : undefined;
+      if (w !== undefined) {
+        setChartConfig(Object.assign({}, chartConfig, { width: w }));
+      }
+    }, 1);
   }, []);
 
-  return <svg ref={svgRef} preserveAspectRatio="xMinYMin meet" width="100%" height="100%"></svg>;
+  useLayoutEffect(() => {
+    if (chartConfig.width != undefined && svgRef.current != null) {
+      const xAixs = new DrawXAixs(svgRef.current, chartConfig, data);
+      const yAixs = new DrawYAixs(svgRef.current, chartConfig, data);
+      const line = new DrawLine(svgRef.current, chartConfig, data, xAixs, yAixs);
+    }
+  }, [chartConfig, svgRef.current]);
+
+  return <svg ref={svgRef} preserveAspectRatio="xMinYMin meet" width="100%" height={chartConfig.height}></svg>;
 }
 
 export default LineChart;

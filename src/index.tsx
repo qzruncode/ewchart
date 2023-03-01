@@ -1,39 +1,46 @@
-import React, { Suspense, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import LineChart from './chart/LineChart';
 import { IEWChartProps } from '../types';
+import getColors from './toolkit/color';
 
-const defaultConfig = { height: 400, top: 20, right: 30, bottom: 30, left: 50 };
+const defaultConfig = { height: 400, top: 20, right: 30, bottom: 30, left: 50, width: undefined };
 export const ConfigContext = React.createContext(defaultConfig);
 
 function EWChart(props: IEWChartProps) {
-  const chartRef = useRef(null);
-  const [chartConfig, setChartConfig] = useState(defaultConfig);
+  const [id] = useState(() => 'ewchart_' + new Date().getTime() + Math.random().toString(36).substring(2));
 
   useEffect(() => {
-    setChartConfig(Object.assign(chartConfig, props.size, { width: getChartWidth() }));
+    initColor();
+    // window.addEventListener('resize', () => {
+    //   console.log('执行了');
+    // });
   }, []);
+
+  const initColor = () => {
+    const setColors = data => {
+      data.forEach((item, index) => {
+        item.color || (item.color = getColors(index));
+      });
+    };
+
+    if (props.data.groups) {
+      setColors(props.data.groups);
+    }
+  };
 
   const getChart = () => {
     const chart = props.chart;
     switch (chart.type) {
       case 'line':
-        return <LineChart data={props.data} />;
+        return <LineChart data={props.data} id={id} />;
       default:
         return null;
     }
   };
 
-  const getChartWidth = () => {
-    if (chartRef.current) {
-      const chartWidth = Number(getComputedStyle(chartRef.current).width.slice(0, -2));
-      return chartWidth;
-    }
-    return null;
-  };
-
   return (
-    <div ref={chartRef}>
-      <ConfigContext.Provider value={chartConfig}>{getChart()}</ConfigContext.Provider>
+    <div className={id}>
+      <ConfigContext.Provider value={Object.assign({}, defaultConfig, props.size)}>{getChart()}</ConfigContext.Provider>
     </div>
   );
 }

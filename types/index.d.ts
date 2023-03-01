@@ -29,6 +29,17 @@ export interface IEWChartProps {
       end: number;
       interval: number;
     };
+    y: {
+      start: number;
+      end: number;
+    };
+    yUnit: 'K' | string;
+    groups: Array<{
+      color?: string;
+      lineType: 'dotted' | 'solid';
+      label: string;
+      values: number[];
+    }>;
   };
 }
 
