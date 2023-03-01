@@ -3,19 +3,30 @@ import { ConfigContext } from '..';
 import { DrawXAixs, DrawYAixs } from '../toolkit/axis';
 import { DrawLine } from '../toolkit/line';
 
-function LineChart({ data, id }) {
+function LineChart({ data, id, subscription }) {
   const svgRef = useRef(null);
   const config = useContext(ConfigContext);
   const [chartConfig, setChartConfig] = useState(config);
 
   useEffect(() => {
-    const box = document.querySelector(`.${id}`)?.parentElement;
+    const box = document.querySelector(`.${id}`);
     setTimeout(() => {
       const w = box ? Number(getComputedStyle(box).width.slice(0, -2)) : undefined;
       if (w !== undefined) {
         setChartConfig(Object.assign({}, chartConfig, { width: w }));
       }
     }, 1);
+
+    const unsub = subscription.subscribe(() => {
+      const box = document.querySelector(`.${id}`);
+      const w = box ? Number(getComputedStyle(box).width.slice(0, -2)) : undefined;
+      if (w !== undefined) {
+        setChartConfig(Object.assign({}, chartConfig, { width: w }));
+      }
+    });
+    return () => {
+      unsub();
+    };
   }, []);
 
   useLayoutEffect(() => {

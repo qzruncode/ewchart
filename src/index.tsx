@@ -2,18 +2,25 @@ import React, { useEffect, useState } from 'react';
 import LineChart from './chart/LineChart';
 import { IEWChartProps } from '../types';
 import getColors from './toolkit/color';
+import { throttle } from './toolkit/helper';
+import Subscription from './toolkit/subscription';
 
 const defaultConfig = { height: 400, top: 20, right: 30, bottom: 30, left: 50, width: undefined };
 export const ConfigContext = React.createContext(defaultConfig);
 
 function EWChart(props: IEWChartProps) {
+  const [subscription] = useState(new Subscription());
   const [id] = useState(() => 'ewchart_' + new Date().getTime() + Math.random().toString(36).substring(2));
 
   useEffect(() => {
     initColor();
-    // window.addEventListener('resize', () => {
-    //   console.log('执行了');
-    // });
+    const fn = throttle(() => {
+      subscription.publish();
+    });
+    window.addEventListener('resize', fn);
+    return () => {
+      window.removeEventListener('resize', fn);
+    };
   }, []);
 
   const initColor = () => {
@@ -32,7 +39,7 @@ function EWChart(props: IEWChartProps) {
     const chart = props.chart;
     switch (chart.type) {
       case 'line':
-        return <LineChart data={props.data} id={id} />;
+        return <LineChart data={props.data} id={id} subscription={subscription} />;
       default:
         return null;
     }
