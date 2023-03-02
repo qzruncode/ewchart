@@ -29,13 +29,13 @@ function LineChart({ data, id, subscription }) {
     };
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (chartConfig.width != undefined && svgRef.current != null) {
       const xAixs = new DrawXAixs(svgRef.current, chartConfig, data);
       const yAixs = new DrawYAixs(svgRef.current, chartConfig, data);
       const line = new DrawLine(svgRef.current, chartConfig, data, xAixs, yAixs);
     }
-  }, [chartConfig, svgRef.current]);
+  }, [chartConfig, svgRef.current, data]);
 
   return <svg ref={svgRef} preserveAspectRatio="xMinYMin meet" width="100%" height={chartConfig.height}></svg>;
 }

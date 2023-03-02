@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import './index.less';
 import LineChart from './chart/LineChart';
 import { IEWChartProps } from '../types';
 import getColors from './toolkit/color';
@@ -10,10 +11,9 @@ export const ConfigContext = React.createContext(defaultConfig);
 
 function EWChart(props: IEWChartProps) {
   const [subscription] = useState(new Subscription());
-  const [id] = useState(() => 'ewchart_' + new Date().getTime() + Math.random().toString(36).substring(2));
+  const [id] = useState(() => 'ewchart-' + new Date().getTime() + Math.random().toString(36).substring(2));
 
   useEffect(() => {
-    initColor();
     const fn = throttle(() => {
       subscription.publish();
     });
@@ -22,6 +22,10 @@ function EWChart(props: IEWChartProps) {
       window.removeEventListener('resize', fn);
     };
   }, []);
+
+  useLayoutEffect(() => {
+    initColor();
+  }, [props.data]);
 
   const initColor = () => {
     const setColors = data => {
@@ -47,7 +51,15 @@ function EWChart(props: IEWChartProps) {
 
   return (
     <div className={id}>
-      <ConfigContext.Provider value={Object.assign({}, defaultConfig, props.size)}>{getChart()}</ConfigContext.Provider>
+      {props.data.groups.length === 0 ? (
+        <div className="null-box" style={{ height: props.size.height }}>
+          暂无数据
+        </div>
+      ) : (
+        <ConfigContext.Provider value={Object.assign({}, defaultConfig, props.size)}>
+          {getChart()}
+        </ConfigContext.Provider>
+      )}
     </div>
   );
 }
