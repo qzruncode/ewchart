@@ -2,9 +2,9 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 import './index.less';
 import LineChart from './chart/LineChart';
 import { IEWChartProps } from '../types';
-import getColors from './toolkit/color';
 import { throttle } from './toolkit/helper';
 import Subscription from './toolkit/subscription';
+import { getColors } from './toolkit/color';
 
 const defaultConfig = { height: 400, top: 20, right: 30, bottom: 30, left: 50, width: undefined };
 export const ConfigContext = React.createContext(defaultConfig);
@@ -63,5 +63,5 @@ function EWChart(props: IEWChartProps) {
     </div>
   );
 }
-
+export const getColorsByIndex = getColors;
 export default EWChart;

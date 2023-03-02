@@ -47,7 +47,7 @@ const colors = [
   '#3F2B5B',
 ];
 
-const getColors = (i, o = 1) => {
+export const getColors = (i, o = 1) => {
   if (o === 1) return colors[i % colors.length];
   else return colors[i % colors.length] + o.toString(16).slice(2, 4).padEnd(2, '0');
 };
@@ -55,5 +55,3 @@ const getColors = (i, o = 1) => {
 export const opacityColor = (c, o) => {
   return c + o.toString(16).slice(2, 4).padEnd(2, '0');
 };
-
-export default getColors;

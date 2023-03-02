@@ -9,6 +9,20 @@ export interface Igroup {
   values: Array<number | null>;
 }
 
+export interface EWChartData {
+  x: {
+    start: number;
+    end: number;
+    interval: number;
+  };
+  y: {
+    start: number;
+    end: number;
+  };
+  yUnit: 'K' | string;
+  groups: Array<Igroup>;
+}
+
 export interface IEWChartProps {
   chart: {
     type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'path' | 'curveline';
@@ -22,21 +36,10 @@ export interface IEWChartProps {
     left: number;
   };
 
-  data: {
-    x: {
-      start: number;
-      end: number;
-      interval: number;
-    };
-    y: {
-      start: number;
-      end: number;
-    };
-    yUnit: 'K' | string;
-    groups: Array<Igroup>;
-  };
+  data: EWChartData;
 }
 
 function EWChart(props: IEWChartProps): React.ReactElement;
 
+export const getColorsByIndex = (index: number) => string;
 export default EWChart;
