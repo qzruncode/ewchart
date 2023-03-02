@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ConfigContext } from '..';
 import { DrawXAixs, DrawYAixs } from '../toolkit/axis';
+import { drawClipPath } from '../toolkit/clip';
 import { DrawLine } from '../toolkit/line';
 
 function LineChart({ data, id, subscription }) {
@@ -34,6 +35,7 @@ function LineChart({ data, id, subscription }) {
       const xAixs = new DrawXAixs(svgRef.current, chartConfig, data);
       const yAixs = new DrawYAixs(svgRef.current, chartConfig, data);
       const line = new DrawLine(svgRef.current, chartConfig, data, xAixs, yAixs);
+      drawClipPath(svgRef.current, chartConfig);
     }
   }, [chartConfig, svgRef.current, data]);
 
