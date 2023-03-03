@@ -21,17 +21,17 @@ export function DrawLine(
     }
   });
 
+  let breakLineEle = svgEle.select('g.breakline_ele');
   if (breakLines.length > 0) {
+    if (breakLineEle.empty()) {
+      breakLineEle = svgEle.append('g').attr('class', 'breakline_ele');
+    }
     const line = d3
       .line()
       .defined((d: any) => d != null && !isNaN(d))
       .x((d, i) => xAixs.func(xAixs.data[i]))
       .y(d => yAixs.func(d != null && !isNaN(d) ? d : 0));
 
-    let breakLineEle = svgEle.select('g.breakline_ele');
-    if (breakLineEle.empty()) {
-      breakLineEle = svgEle.append('g').attr('class', 'breakline_ele');
-    }
     breakLineEle.attr('clip-path', 'url(#clip)');
     breakLineEle
       .selectAll('path')
@@ -45,10 +45,14 @@ export function DrawLine(
       .attr('stroke-linecap', 'round')
       .attr('stroke', d => d.color)
       .attr('d', d => line(d.values));
+  } else {
+    if (!breakLineEle.empty()) {
+      breakLineEle.selectAll('path').remove();
+    }
   }
 
+  let lineEle = svgEle.select('g.line_ele');
   if (lines.length > 0) {
-    let lineEle = svgEle.select('g.line_ele');
     if (lineEle.empty()) {
       lineEle = svgEle.append('g').attr('class', 'line_ele');
     }
@@ -86,5 +90,9 @@ export function DrawLine(
         .attr('stroke', data.color)
         .attr('d', line(I.filter(i => D[i]))); // 根据非null值的索引，找到非null值的x和y坐标，绘制curveLinear
     });
+  } else {
+    if (!lineEle.empty()) {
+      lineEle.selectAll('path').remove();
+    }
   }
 }
