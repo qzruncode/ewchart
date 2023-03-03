@@ -3,6 +3,7 @@ import { ConfigContext } from '..';
 import { DrawXAixs, DrawYAixs } from '../toolkit/axis';
 import { drawClipPath } from '../toolkit/clip';
 import { DrawLine } from '../toolkit/line';
+import mouseMove from '../toolkit/move';
 
 function LineChart({ data, id, subscription }) {
   const svgRef = useRef(null);
@@ -31,12 +32,17 @@ function LineChart({ data, id, subscription }) {
   }, []);
 
   useEffect(() => {
+    let clear;
     if (chartConfig.width != undefined && svgRef.current != null) {
       const xAixs = new DrawXAixs(svgRef.current, chartConfig, data);
       const yAixs = new DrawYAixs(svgRef.current, chartConfig, data);
       const line = new DrawLine(svgRef.current, chartConfig, data, xAixs, yAixs);
       drawClipPath(svgRef.current, chartConfig);
+      clear = mouseMove(svgRef.current, chartConfig, xAixs, yAixs);
     }
+    return () => {
+      clear && clear();
+    };
   }, [chartConfig, svgRef.current, data]);
 
   return <svg ref={svgRef} preserveAspectRatio="xMinYMin meet" width="100%" height={chartConfig.height}></svg>;
