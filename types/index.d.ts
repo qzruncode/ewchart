@@ -37,6 +37,12 @@ export interface IEWChartProps {
   };
 
   data: EWChartData;
+
+  onMove?: (
+    type: 'enter' | 'move' | 'leave',
+    data: Array<{ color?: string; label: string; value: number | null; x: number; y: number }>,
+    position: { x: number; y: number }
+  ) => void;
 }
 
 function EWChart(props: IEWChartProps): React.ReactElement;

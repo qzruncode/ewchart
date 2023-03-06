@@ -56,7 +56,7 @@ function EWChart(props: IEWChartProps) {
           暂无数据
         </div>
       ) : (
-        <ConfigContext.Provider value={Object.assign({}, defaultConfig, props.size)}>
+        <ConfigContext.Provider value={Object.assign({}, defaultConfig, props.size, { onMove: props.onMove })}>
           {getChart()}
         </ConfigContext.Provider>
       )}

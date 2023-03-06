@@ -54,13 +54,17 @@ function MoveCross(this: any, cross, config, position, xAixs, yAixs) {
 
 function DrawCircle(this: any, svg, moveCross, yAixs, data: IEWChartProps['data']) {
   const svgEle = d3.select(svg);
-  const ys: Array<{ y: number; c: string | undefined }> = [];
+  const ys: Array<{ x: number; y: number; c: string | undefined; label: string; value: number | null }> = [];
   data.groups.forEach(group => {
-    const y = yAixs.func(group.values[moveCross.xIndex]); // y坐标
+    const value = group.values[moveCross.xIndex];
+    const y = yAixs.func(value); // y坐标
     if (y !== undefined) {
       ys.push({
+        x: moveCross.x,
         y,
         c: group.color,
+        label: group.label,
+        value,
       });
     }
   });
@@ -80,6 +84,7 @@ function DrawCircle(this: any, svg, moveCross, yAixs, data: IEWChartProps['data'
   circles.exit().remove();
 
   this.circles = svgEle.selectAll('.dot');
+  this.points = ys;
 }
 
 export default function mouseMove(
@@ -100,20 +105,25 @@ export default function mouseMove(
 
   function entered() {
     cross = new DrawCross(svg, config);
+    config.onMove && config.onMove('enter');
   }
 
   let drawCircle;
   function moved(event) {
     const position = d3.pointer(event);
+    if (!cross) {
+      cross = new DrawCross(svg, config);
+    }
     const moveCross = new MoveCross(cross, config, position, xAixs, yAixs);
     drawCircle = new DrawCircle(svg, moveCross, yAixs, data);
+    config.onMove && config.onMove('move', drawCircle.points, { x: position[0], y: position[1] });
   }
 
   function leaved() {
-    console.log('执行了');
     cross.xcrossEle.remove();
     cross.ycrossEle.remove();
     drawCircle.circles.remove();
+    config.onMove && config.onMove('leave');
   }
 
   return () => {
