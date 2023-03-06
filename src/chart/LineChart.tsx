@@ -38,7 +38,7 @@ function LineChart({ data, id, subscription }) {
       const yAixs = new DrawYAixs(svgRef.current, chartConfig, data);
       const line = new DrawLine(svgRef.current, chartConfig, data, xAixs, yAixs);
       drawClipPath(svgRef.current, chartConfig);
-      clear = mouseMove(svgRef.current, chartConfig, xAixs, yAixs);
+      clear = mouseMove(svgRef.current, chartConfig, data, xAixs, yAixs);
     }
     return () => {
       clear && clear();

@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { IEWChartProps } from '../../types';
 
 function DrawCross(this: any, svg, config) {
   const svgEle = d3.select(svg);
@@ -32,7 +33,7 @@ function DrawCross(this: any, svg, config) {
   this.ycrossEle = ycrossEle;
 }
 
-function moveCross(cross, config, position, xAixs, yAixs) {
+function MoveCross(this: any, cross, config, position, xAixs, yAixs) {
   const { left, right, width } = config;
   const ycross_line = cross.ycrossEle.select('path.ycross_line');
   const ycross_text = cross.ycrossEle.select('text.ycross_text');
@@ -46,11 +47,45 @@ function moveCross(cross, config, position, xAixs, yAixs) {
   const xIndex = d3.bisectCenter(xAixs.data, xm); // 根据svg坐标获取最近点的索引
   const x = xAixs.func(xAixs.data[xIndex]); // 根据索引获取svg坐标值，进而获取用户坐标值
   cross.xcrossEle.attr('x1', x).attr('x2', x);
+
+  this.xIndex = xIndex;
+  this.x = x;
+}
+
+function DrawCircle(this: any, svg, moveCross, yAixs, data: IEWChartProps['data']) {
+  const svgEle = d3.select(svg);
+  const ys: Array<{ y: number; c: string | undefined }> = [];
+  data.groups.forEach(group => {
+    const y = yAixs.func(group.values[moveCross.xIndex]); // y坐标
+    if (y !== undefined) {
+      ys.push({
+        y,
+        c: group.color,
+      });
+    }
+  });
+
+  const circles = svgEle.selectAll('.dot').data(ys);
+  circles.attr('cx', moveCross.x).attr('cy', d => d.y);
+  circles
+    .enter()
+    .append('circle')
+    .attr('class', 'dot')
+    .attr('cx', moveCross.x)
+    .attr('cy', d => d.y)
+    .attr('r', 3.5)
+    .attr('fill', 'none')
+    .attr('stroke', d => d.c);
+
+  circles.exit().remove();
+
+  this.circles = svgEle.selectAll('.dot');
 }
 
 export default function mouseMove(
   svg,
   config,
+  data: IEWChartProps['data'],
   xAixs: { func: d3.ScaleTime<number, number, never>; data: Date[] },
   yAixs: { func: d3.ScaleTime<number, number, never> }
 ) {
@@ -67,16 +102,18 @@ export default function mouseMove(
     cross = new DrawCross(svg, config);
   }
 
+  let drawCircle;
   function moved(event) {
     const position = d3.pointer(event);
-    moveCross(cross, config, position, xAixs, yAixs);
-    console.log(position);
+    const moveCross = new MoveCross(cross, config, position, xAixs, yAixs);
+    drawCircle = new DrawCircle(svg, moveCross, yAixs, data);
   }
 
   function leaved() {
     console.log('执行了');
     cross.xcrossEle.remove();
     cross.ycrossEle.remove();
+    drawCircle.circles.remove();
   }
 
   return () => {
