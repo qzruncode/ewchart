@@ -6,7 +6,16 @@ import { throttle } from './toolkit/helper';
 import Subscription from './toolkit/subscription';
 import { getColors } from './toolkit/color';
 
-const defaultConfig = { height: 400, top: 20, right: 30, bottom: 30, left: 50, width: undefined };
+const defaultConfig = {
+  height: 400,
+  top: 20,
+  right: 30,
+  bottom: 30,
+  left: 50,
+  width: undefined,
+  onMove: null,
+  mouse: null,
+};
 export const ConfigContext = React.createContext(defaultConfig);
 
 function EWChart(props: IEWChartProps) {
@@ -40,8 +49,8 @@ function EWChart(props: IEWChartProps) {
   };
 
   const getChart = () => {
-    const chart = props.chart;
-    switch (chart.type) {
+    const type = props.type;
+    switch (type) {
       case 'line':
         return <LineChart data={props.data} id={id} subscription={subscription} />;
       default:
@@ -52,11 +61,11 @@ function EWChart(props: IEWChartProps) {
   return (
     <div className={id}>
       {props.data.groups.length === 0 ? (
-        <div className="null-box" style={{ height: props.size.height }}>
+        <div className="null-box" style={{ height: props.size ? props.size.height : defaultConfig.height }}>
           暂无数据
         </div>
       ) : (
-        <ConfigContext.Provider value={Object.assign({}, defaultConfig, props.size, { onMove: props.onMove })}>
+        <ConfigContext.Provider value={Object.assign({}, defaultConfig, props.size, props.method, props.interactive)}>
           {getChart()}
         </ConfigContext.Provider>
       )}

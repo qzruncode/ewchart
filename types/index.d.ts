@@ -24,25 +24,27 @@ export interface EWChartData {
 }
 
 export interface IEWChartProps {
-  chart: {
-    type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'path' | 'curveline';
+  type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'path' | 'curveline';
+  size?: {
+    height?: number;
+    top?: number;
+    right?: number;
+    bottom?: number;
+    left?: number;
   };
-
-  size: {
-    height: number;
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-  };
-
   data: EWChartData;
-
-  onMove?: (
-    type: 'enter' | 'move' | 'leave',
-    data: Array<{ color?: string; label: string; value: number | null; x: number; y: number }>,
-    position: { x: number; y: number }
-  ) => void;
+  method?: {
+    onMove?: (
+      type: 'enter' | 'move' | 'leave',
+      data: Array<{ color?: string; label: string; value: number | null; x: number; y: number }>,
+      position: { x: number; y: number }
+    ) => void;
+  };
+  interactive?: {
+    mouse?: {
+      crossText?: boolean;
+    };
+  };
 }
 
 function EWChart(props: IEWChartProps): React.ReactElement;

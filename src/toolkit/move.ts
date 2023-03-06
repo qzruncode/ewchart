@@ -36,12 +36,15 @@ function DrawCross(this: any, svg, config) {
 function MoveCross(this: any, cross, config, position, xAixs, yAixs) {
   const { left, right, width } = config;
   const ycross_line = cross.ycrossEle.select('path.ycross_line');
-  const ycross_text = cross.ycrossEle.select('text.ycross_text');
+
   const path = d3.path();
   path.moveTo(left, position[1]);
   path.lineTo(width - right, position[1]);
   ycross_line.attr('d', path.toString());
-  ycross_text.attr('y', position[1]).attr('x', left).text(yAixs.func.invert(position[1]).toFixed(2));
+  if (config.mouse.crossText) {
+    const ycross_text = cross.ycrossEle.select('text.ycross_text');
+    ycross_text.attr('y', position[1]).attr('x', left).text(yAixs.func.invert(position[1]).toFixed(2));
+  }
 
   const xm = xAixs.func.invert(position[0]); // 根据用户坐标获取svg坐标
   const xIndex = d3.bisectCenter(xAixs.data, xm); // 根据svg坐标获取最近点的索引
