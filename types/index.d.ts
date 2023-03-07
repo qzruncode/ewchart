@@ -25,6 +25,8 @@ export interface EWChartData {
 
 export interface IEWChartProps {
   type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'path' | 'curveline';
+  style?: { [name: string]: any };
+  className?: string;
   size?: {
     height?: number;
     top?: number;
@@ -42,6 +44,7 @@ export interface IEWChartProps {
   };
   interactive?: {
     mouse?: {
+      group?: string;
       crossText?: boolean;
     };
   };

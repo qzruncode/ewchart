@@ -18,6 +18,7 @@ const defaultConfig = {
 };
 export const ConfigContext = React.createContext(defaultConfig);
 
+export const mouseMoves: Array<any> = [];
 function EWChart(props: IEWChartProps) {
   const [subscription] = useState(new Subscription());
   const [id] = useState(() => 'ewchart-' + new Date().getTime() + Math.random().toString(36).substring(2));
@@ -59,7 +60,7 @@ function EWChart(props: IEWChartProps) {
   };
 
   return (
-    <div className={id}>
+    <div className={id + (props.className ? ` ${props.className}` : '')} style={props.style ? props.style : undefined}>
       {props.data.groups.length === 0 ? (
         <div className="null-box" style={{ height: props.size ? props.size.height : defaultConfig.height }}>
           暂无数据

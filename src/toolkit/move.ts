@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { mouseMoves } from '..';
 import { IEWChartProps } from '../../types';
 
 function DrawCross(this: any, svg, config) {
@@ -90,13 +91,15 @@ function DrawCircle(this: any, svg, moveCross, yAixs, data: IEWChartProps['data'
   this.points = ys;
 }
 
-export default function mouseMove(
+export default function MouseMove(
+  this: any,
   svg,
   config,
   data: IEWChartProps['data'],
   xAixs: { func: d3.ScaleTime<number, number, never>; data: Date[] },
   yAixs: { func: d3.ScaleTime<number, number, never> }
 ) {
+  const that = this;
   const svgEle = d3.select(svg);
   svgEle.style('-webkit-tap-highlight-color', 'transparent');
   if ('ontouchstart' in document) {
@@ -106,13 +109,27 @@ export default function mouseMove(
   }
   let cross;
 
-  function entered() {
+  function entered(event, passive) {
+    config.mouse.group != undefined &&
+      !passive &&
+      mouseMoves
+        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.mouse.group)
+        .forEach(mouseMove => {
+          mouseMove.entered(event, true);
+        });
     cross = new DrawCross(svg, config);
     config.onMove && config.onMove('enter');
   }
 
   let drawCircle;
-  function moved(event) {
+  function moved(event, passive) {
+    config.mouse.group != undefined &&
+      !passive &&
+      mouseMoves
+        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.mouse.group)
+        .forEach(mouseMove => {
+          mouseMove.moved(event, true);
+        });
     const position = d3.pointer(event);
     if (!cross) {
       cross = new DrawCross(svg, config);
@@ -122,14 +139,29 @@ export default function mouseMove(
     config.onMove && config.onMove('move', drawCircle.points, { x: position[0], y: position[1] });
   }
 
-  function leaved() {
+  function leaved(event, passive) {
+    config.mouse.group != undefined &&
+      !passive &&
+      mouseMoves
+        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.mouse.group)
+        .forEach(mouseMove => {
+          mouseMove.leaved(event, true);
+        });
     cross.xcrossEle.remove();
     cross.ycrossEle.remove();
     drawCircle.circles.remove();
     config.onMove && config.onMove('leave');
   }
 
-  return () => {
+  const clear = () => {
     svgEle.on('.');
   };
+
+  if (config.mouse.group != undefined) {
+    this.group = config.mouse.group;
+  }
+  this.entered = entered;
+  this.moved = moved;
+  this.leaved = leaved;
+  this.clear = clear;
 }
