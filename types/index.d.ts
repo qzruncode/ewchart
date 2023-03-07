@@ -41,11 +41,15 @@ export interface IEWChartProps {
       data: Array<{ color?: string; label: string; value: number | null; x: number; y: number }>,
       position: { x: number; y: number }
     ) => void;
+    onSelect?: (dateRange: Date[]) => void;
   };
   interactive?: {
+    group?: string;
     mouse?: {
-      group?: string;
       crossText?: boolean;
+    };
+    select?: {
+      min: number;
     };
   };
 }

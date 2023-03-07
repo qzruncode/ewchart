@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ConfigContext, mouseMoves } from '..';
 import { DrawXAixs, DrawYAixs } from '../toolkit/axis';
+import { DrawBrush } from '../toolkit/brush';
 import { drawClipPath } from '../toolkit/clip';
 import { DrawLine } from '../toolkit/line';
 import MouseMove from '../toolkit/move';
@@ -33,6 +34,7 @@ function LineChart({ data, id, subscription }) {
 
   useEffect(() => {
     let mouseMove;
+    let brush;
     if (chartConfig.width != undefined && svgRef.current != null) {
       const xAixs = new DrawXAixs(svgRef.current, chartConfig, data);
       const yAixs = new DrawYAixs(svgRef.current, chartConfig, data);
@@ -42,9 +44,13 @@ function LineChart({ data, id, subscription }) {
         mouseMove = new MouseMove(svgRef.current, chartConfig, data, xAixs, yAixs);
         mouseMoves.push(mouseMove);
       }
+      if (chartConfig.select) {
+        brush = new DrawBrush(svgRef.current, chartConfig, data, line, xAixs, yAixs);
+      }
     }
     return () => {
       mouseMove && mouseMove.clear && mouseMove.clear();
+      brush && brush.clear && brush.clear();
     };
   }, [chartConfig, svgRef.current, data]);
 

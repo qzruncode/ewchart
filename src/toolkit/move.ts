@@ -110,10 +110,10 @@ export default function MouseMove(
   let cross;
 
   function entered(event, passive) {
-    config.mouse.group != undefined &&
+    config.group != undefined &&
       !passive &&
       mouseMoves
-        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.mouse.group)
+        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.group)
         .forEach(mouseMove => {
           mouseMove.entered(event, true);
         });
@@ -123,10 +123,10 @@ export default function MouseMove(
 
   let drawCircle;
   function moved(event, passive) {
-    config.mouse.group != undefined &&
+    config.group != undefined &&
       !passive &&
       mouseMoves
-        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.mouse.group)
+        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.group)
         .forEach(mouseMove => {
           mouseMove.moved(event, true);
         });
@@ -140,10 +140,10 @@ export default function MouseMove(
   }
 
   function leaved(event, passive) {
-    config.mouse.group != undefined &&
+    config.group != undefined &&
       !passive &&
       mouseMoves
-        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.mouse.group)
+        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.group)
         .forEach(mouseMove => {
           mouseMove.leaved(event, true);
         });
@@ -157,8 +157,8 @@ export default function MouseMove(
     svgEle.on('.');
   };
 
-  if (config.mouse.group != undefined) {
-    this.group = config.mouse.group;
+  if (config.group!= undefined) {
+    this.group = config.group;
   }
   this.entered = entered;
   this.moved = moved;

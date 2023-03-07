@@ -14,7 +14,10 @@ const defaultConfig = {
   left: 50,
   width: undefined,
   onMove: null,
+  onSelect: null,
+  group: undefined,
   mouse: null,
+  select: null,
 };
 export const ConfigContext = React.createContext(defaultConfig);
 

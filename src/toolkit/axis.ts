@@ -23,12 +23,15 @@ export function DrawXAixs(this: any, svg, config, data: IEWChartProps['data']) {
         .axisBottom(func)
         .ticks(xData.length < 10 ? 5 : 10)
         .tickSizeOuter(0)
-        .tickFormat(d3.timeFormat('%H:%M') as any)
+        .tickFormat(d3.timeFormat('%H:%M:%S') as any)
     );
   xEle.call(axis);
 
   this.func = func;
   this.data = xData;
+  this.recall = () => {
+    xEle.call(axis);
+  };
 }
 
 export function DrawYAixs(this: any, svg, config, data: IEWChartProps['data']) {
