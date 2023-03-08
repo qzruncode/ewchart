@@ -2,29 +2,30 @@ import React from 'react';
 
 export interface Igroup {
   color?: string;
-  lineType: 'dotted' | 'solid';
+  lineType?: 'dotted' | 'solid';
   label: string;
-  break: 'line' | 'none';
+  break?: 'line' | 'none';
   breakType?: 'dotted' | 'solid';
-  values: Array<number | null>;
+  values?: Array<number | null>;
+  value?: number;
 }
 
 export interface EWChartData {
-  x: {
+  x?: {
     start: number;
     end: number;
     interval: number;
   };
-  y: {
+  y?: {
     start: number;
     end: number;
   };
-  yUnit: 'K' | string;
+  yUnit?: 'K' | string;
   groups: Array<Igroup>;
 }
 
 export interface IEWChartProps {
-  type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'path' | 'curveline';
+  type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'path';
   style?: { [name: string]: any };
   className?: string;
   size?: {

@@ -5,6 +5,7 @@ import { IEWChartProps } from '../types';
 import { throttle } from './toolkit/helper';
 import Subscription from './toolkit/subscription';
 import { getColors } from './toolkit/color';
+import PieChart from './chart/PieChart';
 
 const defaultConfig = {
   height: 400,
@@ -58,6 +59,8 @@ function EWChart(props: IEWChartProps) {
       case 'line':
       case 'arealine':
         return <LineChart data={props.data} id={id} subscription={subscription} type={type} />;
+      case 'path':
+        return <PieChart data={props.data} id={id} subscription={subscription} />;
       default:
         return null;
     }
