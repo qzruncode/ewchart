@@ -3,10 +3,10 @@ import { ConfigContext, mouseMoves } from '..';
 import { DrawXAixs, DrawYAixs } from '../toolkit/axis';
 import { DrawBrush } from '../toolkit/brush';
 import { drawClipPath } from '../toolkit/clip';
-import { DrawLine } from '../toolkit/line';
+import { DrawAreaLine, DrawLine } from '../toolkit/line';
 import MouseMove from '../toolkit/move';
 
-function LineChart({ data, id, subscription }) {
+function LineChart({ data, id, subscription, type }) {
   const svgRef = useRef(null);
   const config = useContext(ConfigContext);
   const [chartConfig, setChartConfig] = useState(config);
@@ -38,7 +38,12 @@ function LineChart({ data, id, subscription }) {
     if (chartConfig.width != undefined && svgRef.current != null) {
       const xAixs = new DrawXAixs(svgRef.current, chartConfig, data);
       const yAixs = new DrawYAixs(svgRef.current, chartConfig, data);
-      const line = new DrawLine(svgRef.current, chartConfig, data, xAixs, yAixs);
+      let line;
+      if (type === 'arealine') {
+        line = new DrawAreaLine(svgRef.current, chartConfig, data, xAixs, yAixs);
+      } else if (type === 'line') {
+        line = new DrawLine(svgRef.current, chartConfig, data, xAixs, yAixs);
+      }
       drawClipPath(svgRef.current, chartConfig);
       if (chartConfig.mouse) {
         mouseMove = new MouseMove(svgRef.current, chartConfig, data, xAixs, yAixs);

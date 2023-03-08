@@ -56,7 +56,8 @@ function EWChart(props: IEWChartProps) {
     const type = props.type;
     switch (type) {
       case 'line':
-        return <LineChart data={props.data} id={id} subscription={subscription} />;
+      case 'arealine':
+        return <LineChart data={props.data} id={id} subscription={subscription} type={type} />;
       default:
         return null;
     }
