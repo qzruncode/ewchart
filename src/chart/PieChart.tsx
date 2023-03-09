@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 
 import { ConfigContext } from '..';
 import { DrawPie } from '../toolkit/pie';
 import PieMove from '../toolkit/piemove';
+import { drawPieShadow } from '../toolkit/shadow';
 
 function PieChart({ data, id, subscription }) {
   const svgRef = useRef(null);
@@ -34,7 +35,8 @@ function PieChart({ data, id, subscription }) {
     if (chartConfig.width != undefined && svgRef.current != null) {
       const drawPie = new DrawPie(svgRef.current, chartConfig, data);
       if (chartConfig.onMove) {
-        pieMove = new PieMove(drawPie.pie, chartConfig, data);
+        drawPieShadow(svgRef.current);
+        pieMove = new PieMove(drawPie.pie, chartConfig);
       }
     }
     return () => {

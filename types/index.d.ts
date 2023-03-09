@@ -49,6 +49,8 @@ export interface IEWChartProps {
     group?: string;
     mouse?: {
       crossText?: boolean;
+      shadow?: boolean;
+      pieText?: boolean;
     };
     select?: {
       min: number;

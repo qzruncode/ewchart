@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
-import { IEWChartProps } from '../../types';
 
-export default function PieMove(this: any, pieEle, config, data: IEWChartProps['data']) {
+export default function PieMove(this: any, pieEle, config) {
+  const { width, height } = config;
   if ('ontouchstart' in document) {
     pieEle.selectAll('path').on('touchstart', entered).on('touchmove', moved).on('touchend', leaved);
   } else {
@@ -13,18 +13,26 @@ export default function PieMove(this: any, pieEle, config, data: IEWChartProps['
   }
 
   function moved(this: any, event, data) {
-    d3.select(this).style('transform', 'scale(1.05)');
+    const pie = d3.select(this);
+    pie.style('transform', 'scale(1.05)');
+    if (config.mouse.shadow) {
+      pie.attr('filter', 'url(#fds)');
+    }
     const position = d3.pointer(event);
     const point = {
       color: data.data.color,
       label: data.data.label,
       value: data.data.value,
     };
-    config.onMove && config.onMove('move', point, { x: position[0], y: position[1] });
+    config.onMove && config.onMove('move', [point], { x: position[0] + width / 2, y: position[1] + height / 2 });
   }
 
   function leaved(this: any, event) {
-    d3.select(this).style('transform', 'none');
+    const pie = d3.select(this);
+    pie.style('transform', 'none');
+    if (config.mouse.shadow) {
+      pie.attr('filter', 'none');
+    }
     config.onMove && config.onMove('leave');
   }
 
