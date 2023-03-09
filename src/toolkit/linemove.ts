@@ -91,7 +91,7 @@ function DrawCircle(this: any, svg, moveCross, yAixs, data: IEWChartProps['data'
   this.points = ys;
 }
 
-export default function MouseMove(
+export default function LineMove(
   this: any,
   svg,
   config,

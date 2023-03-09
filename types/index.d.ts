@@ -8,6 +8,7 @@ export interface Igroup {
   breakType?: 'dotted' | 'solid';
   values?: Array<number | null>;
   value?: number;
+  choose?: boolean;
 }
 
 export interface EWChartData {
@@ -39,7 +40,7 @@ export interface IEWChartProps {
   method?: {
     onMove?: (
       type: 'enter' | 'move' | 'leave',
-      data: Array<{ color?: string; label: string; value: number | null; x: number; y: number }>,
+      data: Array<{ color?: string; label: string; value: number | null; x?: number; y?: number }>,
       position: { x: number; y: number }
     ) => void;
     onSelect?: (dateRange: Date[]) => void;

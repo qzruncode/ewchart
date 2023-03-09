@@ -59,7 +59,7 @@ function EWChart(props: IEWChartProps) {
       case 'line':
       case 'arealine':
         return <LineChart data={props.data} id={id} subscription={subscription} type={type} />;
-      case 'path':
+      case 'pie':
         return <PieChart data={props.data} id={id} subscription={subscription} />;
       default:
         return null;

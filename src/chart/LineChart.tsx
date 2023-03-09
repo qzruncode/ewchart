@@ -4,7 +4,7 @@ import { DrawXAixs, DrawYAixs } from '../toolkit/axis';
 import { DrawBrush } from '../toolkit/brush';
 import { drawClipPath } from '../toolkit/clip';
 import { DrawAreaLine, DrawLine } from '../toolkit/line';
-import MouseMove from '../toolkit/move';
+import LineMove from '../toolkit/linemove';
 
 function LineChart({ data, id, subscription, type }) {
   const svgRef = useRef(null);
@@ -33,7 +33,7 @@ function LineChart({ data, id, subscription, type }) {
   }, []);
 
   useEffect(() => {
-    let mouseMove;
+    let lineMove;
     let brush;
     if (chartConfig.width != undefined && svgRef.current != null) {
       const xAixs = new DrawXAixs(svgRef.current, chartConfig, data);
@@ -46,15 +46,15 @@ function LineChart({ data, id, subscription, type }) {
       }
       drawClipPath(svgRef.current, chartConfig);
       if (chartConfig.mouse) {
-        mouseMove = new MouseMove(svgRef.current, chartConfig, data, xAixs, yAixs);
-        mouseMoves.push(mouseMove);
+        lineMove = new LineMove(svgRef.current, chartConfig, data, xAixs, yAixs);
+        mouseMoves.push(lineMove);
       }
       if (chartConfig.select) {
         brush = new DrawBrush(svgRef.current, chartConfig, data, line, xAixs, yAixs);
       }
     }
     return () => {
-      mouseMove && mouseMove.clear && mouseMove.clear();
+      lineMove && lineMove.clear && lineMove.clear();
       brush && brush.clear && brush.clear();
     };
   }, [chartConfig, svgRef.current, data]);
