@@ -3,6 +3,7 @@ import { useRef, useContext, useState, useEffect } from 'react';
 import { ConfigContext } from '..';
 import { DrawXBandAixs, DrawYAixs } from '../toolkit/axis';
 import { DrawHistogram } from '../toolkit/histogram';
+import HistogramMove from '../toolkit/histogrammove';
 
 function HistogramChart({ data, id, subscription }) {
   const svgRef = useRef(null);
@@ -31,11 +32,16 @@ function HistogramChart({ data, id, subscription }) {
   }, []);
 
   useEffect(() => {
+    let histogramMove;
     if (chartConfig.width != undefined && svgRef.current != null) {
       const xAixs = new DrawXBandAixs(svgRef.current, chartConfig, data);
       const yAixs = new DrawYAixs(svgRef.current, chartConfig, data);
 
-      new DrawHistogram(svgRef.current, chartConfig, data, xAixs, yAixs);
+      const drawHistogram = new DrawHistogram(svgRef.current, chartConfig, data, xAixs, yAixs);
+
+      if (chartConfig.onMove) {
+        histogramMove = new HistogramMove(drawHistogram, chartConfig, data);
+      }
     }
   }, [chartConfig, svgRef.current, data]);
 
