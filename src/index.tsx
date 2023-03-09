@@ -6,6 +6,7 @@ import { throttle } from './toolkit/helper';
 import Subscription from './toolkit/subscription';
 import { getColors } from './toolkit/color';
 import PieChart from './chart/PieChart';
+import Histogram from './chart/HistogramChart';
 
 const defaultConfig = {
   height: 400,
@@ -61,6 +62,8 @@ function EWChart(props: IEWChartProps) {
         return <LineChart data={props.data} id={id} subscription={subscription} type={type} />;
       case 'pie':
         return <PieChart data={props.data} id={id} subscription={subscription} />;
+      case 'histogram':
+        return <Histogram data={props.data} id={id} subscription={subscription} />;
       default:
         return null;
     }

@@ -23,6 +23,8 @@ export interface EWChartData {
   };
   yUnit?: 'K' | string;
   groups: Array<Igroup>;
+  gap?: number;
+  maxWidth?: number;
 }
 
 export interface IEWChartProps {

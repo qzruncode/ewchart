@@ -67,3 +67,27 @@ export function DrawYAixs(this: any, svg, config, data: IEWChartProps['data']) {
 
   this.func = func;
 }
+
+export function DrawXBandAixs(this: any, svg, config, data: IEWChartProps['data']) {
+  const { left, right, width, height, bottom } = config;
+  const svgEle = d3.select(svg);
+
+  let xEle = svgEle.select('g.x_axis');
+  if (xEle.empty()) {
+    xEle = svgEle.append('g').attr('class', 'x_axis');
+  }
+
+  const func = d3
+    .scaleBand()
+    .domain(data.groups.map(group => group.label))
+    .range([left, width - right])
+    .paddingInner(0.1)
+    .paddingOuter(0.1);
+  const axis = g => g.attr('transform', `translate(0,${height - bottom})`).call(d3.axisBottom(func).tickSizeOuter(0));
+  xEle.call(axis);
+
+  this.func = func;
+  this.recall = () => {
+    xEle.call(axis);
+  };
+}
