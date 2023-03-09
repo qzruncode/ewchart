@@ -9,7 +9,6 @@ export function DrawHistogram(
   xAixs: { func: d3.ScaleBand<string> },
   yAixs: { func: d3.ScaleLinear<number, number, never> }
 ) {
-  const { left, right, width, height, bottom, top } = config;
   const svgEle = d3.select(svg);
 
   const draw = () => {
@@ -28,7 +27,15 @@ export function DrawHistogram(
       const xOffset = xAixs.func(d.label);
       return (xOffset ? xOffset : 0) - ((groupLens - 1) * barInnerGap) / 2;
     };
-    // const getBarX = 
+    const getBarX = (d, i) => i * barWidth + barGap + i * barInnerGap;
+    const getBarY = d => {
+      const min = data.y ? data.y?.start : 0;
+      return d != null ? yAixs.func(d) : yAixs.func(min);
+    };
+    const getBarHeight = d => {
+      const min = data.y ? data.y?.start : 0;
+      return d != null ? yAixs.func(min) - yAixs.func(d) : 0;
+    };
 
     histogramEle
       .selectAll('g.real_histogram')
@@ -40,10 +47,10 @@ export function DrawHistogram(
       .selectAll('rect')
       .data(d => d.values)
       .join('rect')
-      .attr('x', (d, i) => i * barWidth + barGap + i * barInnerGap)
-      .attr('y', d => (d != null ? yAixs.func(d) : yAixs.func(data.y?.start)))
+      .attr('x', getBarX)
+      .attr('y', getBarY)
       .attr('width', barWidth)
-      .attr('height', d => (d != null ? yAixs.func(data.y?.start) - yAixs.func(d) : 0));
+      .attr('height', getBarHeight);
   };
   draw();
   this.reDraw = () => {
