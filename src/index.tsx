@@ -7,6 +7,7 @@ import Subscription from './toolkit/subscription';
 import { getColors } from './toolkit/color';
 import PieChart from './chart/PieChart';
 import Histogram from './chart/HistogramChart';
+import TreeChart from './chart/TreeChart';
 
 const defaultConfig = {
   height: 400,
@@ -65,6 +66,8 @@ function EWChart(props: IEWChartProps) {
         return <PieChart data={props.data} id={id} subscription={subscription} />;
       case 'histogram':
         return <Histogram data={props.data} id={id} subscription={subscription} />;
+      case 'tree':
+        return <TreeChart data={props.data} id={id} subscription={subscription} />;
       default:
         return null;
     }

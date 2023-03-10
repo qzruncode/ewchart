@@ -30,7 +30,7 @@ export interface EWChartData {
 }
 
 export interface IEWChartProps {
-  type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'path';
+  type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'tree';
   style?: { [name: string]: any };
   className?: string;
   size?: {
