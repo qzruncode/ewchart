@@ -2,6 +2,7 @@ import React from 'react';
 import { useRef, useContext, useState, useEffect } from 'react';
 import { ConfigContext } from '..';
 import { DrawXBandAixs, DrawYAixs } from '../toolkit/axis';
+import { drawClipPath } from '../toolkit/clip';
 import { DrawHistogram } from '../toolkit/histogram';
 import HistogramMove from '../toolkit/histogrammove';
 
@@ -38,6 +39,7 @@ function HistogramChart({ data, id, subscription }) {
       const yAixs = new DrawYAixs(svgRef.current, chartConfig, data);
 
       const drawHistogram = new DrawHistogram(svgRef.current, chartConfig, data, xAixs, yAixs);
+      drawClipPath(svgRef.current, chartConfig);
 
       if (chartConfig.onMove) {
         histogramMove = new HistogramMove(svgRef.current, drawHistogram, chartConfig, data);

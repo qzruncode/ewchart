@@ -53,6 +53,7 @@ export interface IEWChartProps {
       crossText?: boolean;
       shadow?: boolean;
       pieText?: boolean;
+      barText?: boolean;
     };
     select?: {
       min: number;

@@ -22,7 +22,7 @@ function grayXtext(react, svg) {
   }
 }
 
-function resetXtext(svg) {
+function resetXtext(svg, config) {
   const svgEle = d3.select(svg);
   const ticks = svgEle.selectAll('.x_axis > g');
   ticks.each(function (p, j) {
@@ -32,6 +32,13 @@ function resetXtext(svg) {
       tt.text(tt.attr('st'));
     }
   });
+
+  if (config.mouse.barText) {
+    const ttBoxEle = svgEle.select('g.tooltip');
+    if (!ttBoxEle.empty()) {
+      ttBoxEle.remove();
+    }
+  }
 }
 
 function moveTooltipText(rect, svg, value, x) {
@@ -45,12 +52,17 @@ function moveTooltipText(rect, svg, value, x) {
     ttEle = ttBoxEle
       .append('text')
       .attr('class', 'tooltip_text')
-      .attr('text-anchor', 'middle')
       .attr('stroke', 'none')
       .attr('fill', 'currentColor')
       .style('font-size', '10px');
   }
-  ttEle.text(value).transition().duration(50).attr('y', rect.dataset.y).attr('x', x);
+
+  ttEle
+    .text(value)
+    .transition()
+    .duration(50)
+    .attr('y', rect.dataset.y - 5)
+    .attr('x', x + +d3.select(rect).attr('x'));
 }
 
 export default function HistogramMove(this: any, svg, drawHistogram, config, data: IEWChartProps['data']) {
@@ -61,7 +73,7 @@ export default function HistogramMove(this: any, svg, drawHistogram, config, dat
   } else {
     fakes.on('mouseenter', entered).on('mousemove', moved).on('mouseleave', leaved);
     svgEle.on('mouseleave', () => {
-      resetXtext(svg);
+      resetXtext(svg, config);
     });
   }
 
@@ -82,7 +94,8 @@ export default function HistogramMove(this: any, svg, drawHistogram, config, dat
     const px = +this.parentElement.dataset.x;
     const mx = +position[0] + px;
     config.onMove && config.onMove('move', [point], { x: mx, y: position[1] });
-    moveTooltipText(this, svg, value, px);
+
+    config.mouse.barText && moveTooltipText(this, svg, value, px);
   }
 
   function leaved(this: any, event) {
