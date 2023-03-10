@@ -56,7 +56,7 @@ function MoveCross(this: any, cross, config, position, xAixs, yAixs) {
   this.x = x;
 }
 
-function DrawCircle(this: any, svg, moveCross, yAixs, data: IEWChartProps['data']) {
+function DrawCircle(this: any, svg, config, moveCross, yAixs, data: IEWChartProps['data']) {
   const svgEle = d3.select(svg);
   const ys: Array<{ x: number; y: number; c: string | undefined; label: string; value: number | null }> = [];
   data.groups.forEach(group => {
@@ -73,19 +73,19 @@ function DrawCircle(this: any, svg, moveCross, yAixs, data: IEWChartProps['data'
     }
   });
 
-  const circles = svgEle.selectAll('.dot').data(ys);
-  circles.attr('cx', moveCross.x).attr('cy', d => d.y);
-  circles
-    .enter()
-    .append('circle')
+  svgEle.selectAll('.dot').remove();
+  svgEle
+    .selectAll('.dot')
+    .data(ys)
+    .join('circle')
+    .attr('cx', moveCross.x)
+    .attr('cy', d => d.y)
     .attr('class', 'dot')
     .attr('cx', moveCross.x)
     .attr('cy', d => d.y)
-    .attr('r', 3.5)
+    .attr('r', data.pointSize != undefined ? data.pointSize * 1.2 : 3.5)
     .attr('fill', 'none')
     .attr('stroke', d => d.c);
-
-  circles.exit().remove();
 
   this.circles = svgEle.selectAll('.dot');
   this.points = ys;
@@ -135,7 +135,7 @@ export default function LineMove(
       cross = new DrawCross(svg, config);
     }
     const moveCross = new MoveCross(cross, config, position, xAixs, yAixs);
-    drawCircle = new DrawCircle(svg, moveCross, yAixs, data);
+    drawCircle = new DrawCircle(svg, config, moveCross, yAixs, data);
     config.onMove && config.onMove('move', drawCircle.points, { x: position[0], y: position[1] });
   }
 
@@ -157,7 +157,7 @@ export default function LineMove(
     svgEle.on('.');
   };
 
-  if (config.group!= undefined) {
+  if (config.group != undefined) {
     this.group = config.group;
   }
   this.entered = entered;

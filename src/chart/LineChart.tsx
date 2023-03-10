@@ -5,6 +5,7 @@ import { DrawBrush } from '../toolkit/brush';
 import { drawClipPath } from '../toolkit/clip';
 import { DrawAreaLine, DrawLine } from '../toolkit/line';
 import LineMove from '../toolkit/linemove';
+import { DrawPoint } from '../toolkit/point';
 
 function LineChart({ data, id, subscription, type }) {
   const svgRef = useRef(null);
@@ -43,6 +44,8 @@ function LineChart({ data, id, subscription, type }) {
         line = new DrawAreaLine(svgRef.current, chartConfig, data, xAixs, yAixs);
       } else if (type === 'line') {
         line = new DrawLine(svgRef.current, chartConfig, data, xAixs, yAixs);
+      } else if (type === 'scatter') {
+        line = new DrawPoint(svgRef.current, chartConfig, data, xAixs, yAixs);
       }
       drawClipPath(svgRef.current, chartConfig);
       if (chartConfig.mouse) {

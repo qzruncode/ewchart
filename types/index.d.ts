@@ -25,6 +25,8 @@ export interface EWChartData {
   groups: Array<Igroup>;
   gap?: number;
   maxWidth?: number;
+  pointType?: 'fill' | 'stroke';
+  pointSize?: number;
 }
 
 export interface IEWChartProps {
