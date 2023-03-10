@@ -1,6 +1,28 @@
 import * as d3 from 'd3';
 import { IEWChartProps } from '../../types';
 
+function omitXtext(svg, xAixs: { func: d3.ScaleBand<string> }) {
+  const svgEle = d3.select(svg);
+  const ticks = svgEle.selectAll('.x_axis > g');
+  ticks.each(function (p, j) {
+    const text: any = d3.select(this).select('text');
+    if (text && text.node() != null) {
+      const { width } = text.node().getBBox();
+      const maxWidth = xAixs.func.bandwidth();
+
+      if (width > maxWidth) {
+        const sliceWidth = maxWidth * 0.8;
+        const originLength = text.text().length;
+        const sliceLength = originLength / (width / sliceWidth) - 3;
+        const sliceText = text.text().slice(0, sliceLength) + '...';
+        text.attr('ot', text.text());
+        text.attr('st', sliceText);
+        text.text(sliceText);
+      }
+    }
+  });
+}
+
 export function DrawHistogram(
   this: any,
   svg,
@@ -52,6 +74,8 @@ export function DrawHistogram(
       .attr('y', getBarY)
       .attr('width', barWidth)
       .attr('height', getBarHeight);
+
+    omitXtext(svg, xAixs);
   };
   draw();
   this.drawFake = () => {
@@ -61,16 +85,19 @@ export function DrawHistogram(
       .join('g')
       .attr('class', 'fake_histogram')
       .attr('transform', d => `translate(${getGroupXOffset(d)}, 0)`)
+      .attr('data-x', getGroupXOffset)
+      .attr('data-i', (d, i) => i)
       .selectAll('rect')
       .data(d => d.values)
       .join('rect')
       .attr('x', getBarX)
+      .attr('data-y', getBarY)
       .attr('y', 0)
       .attr('fill', '#a8a8a8')
       .style('opacity', 0.01)
       .attr('width', barWidth)
-      .attr('height', yAixs.func(data.y ? data.y.start : 0))
-      .attr('i', (d, i) => i);
+      .attr('height', yAixs.func(data.y ? data.y.start : 0));
+
     return fakes;
   };
   this.reDraw = () => {

@@ -40,9 +40,13 @@ function HistogramChart({ data, id, subscription }) {
       const drawHistogram = new DrawHistogram(svgRef.current, chartConfig, data, xAixs, yAixs);
 
       if (chartConfig.onMove) {
-        histogramMove = new HistogramMove(drawHistogram, chartConfig, data);
+        histogramMove = new HistogramMove(svgRef.current, drawHistogram, chartConfig, data);
       }
     }
+
+    return () => {
+      histogramMove && histogramMove.clear && histogramMove.clear();
+    };
   }, [chartConfig, svgRef.current, data]);
 
   return <svg ref={svgRef} preserveAspectRatio="xMinYMin meet" width="100%" height={chartConfig.height}></svg>;
