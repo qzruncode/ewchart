@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ConfigContext } from '..';
+import { DrawTree } from '../toolkit/tree';
 
 function PieChart({ data, id, subscription }) {
   const svgRef = useRef(null);
@@ -29,13 +30,13 @@ function PieChart({ data, id, subscription }) {
 
   useEffect(() => {
     // let pieMove;
-    // if (chartConfig.width != undefined && svgRef.current != null) {
-    //   const drawPie = new DrawPie(svgRef.current, chartConfig, data);
-    //   if (chartConfig.onMove) {
-    //     drawPieShadow(svgRef.current);
-    //     pieMove = new PieMove(drawPie.pie, chartConfig);
-    //   }
-    // }
+    if (chartConfig.width != undefined && svgRef.current != null) {
+      const drawTree = new DrawTree(svgRef.current, chartConfig, data);
+      // if (chartConfig.onMove) {
+      //   drawPieShadow(svgRef.current);
+      //   pieMove = new PieMove(drawPie.pie, chartConfig);
+      // }
+    }
     // return () => {
     //   pieMove && pieMove.clear && pieMove.clear();
     // };

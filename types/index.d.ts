@@ -22,11 +22,19 @@ export interface EWChartData {
     end: number;
   };
   yUnit?: 'K' | string;
-  groups: Array<Igroup>;
+  groups?: Array<Igroup>;
   gap?: number;
   maxWidth?: number;
   pointType?: 'fill' | 'stroke';
   pointSize?: number;
+  treeData?: EWChartTreeData;
+}
+
+export interface EWChartTreeData {
+  name: string;
+  head?: string[];
+  bottom?: string[];
+  children?: Array<EWChartTreeData>;
 }
 
 export interface IEWChartProps {

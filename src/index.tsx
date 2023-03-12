@@ -75,7 +75,7 @@ function EWChart(props: IEWChartProps) {
 
   return (
     <div className={id + (props.className ? ` ${props.className}` : '')} style={props.style ? props.style : undefined}>
-      {props.data.groups.length === 0 ? (
+      {(props.data.groups && props.data.groups.length === 0) || props.data.treeData == undefined ? (
         <div className="null-box" style={{ height: props.size ? props.size.height : defaultConfig.height }}>
           暂无数据
         </div>
