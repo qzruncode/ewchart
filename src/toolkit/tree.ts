@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { v4 } from 'uuid';
 import { IEWChartProps, EWChartTreeData } from '../../types';
 
 const linkBg = '#000';
@@ -7,16 +8,21 @@ const rectWidth = 100;
 const rectHeight = 55;
 const iconBg = '#ccc';
 const spanNum = 3;
+const userDeepNum = 3;
 
-export function DrawTree(this: any, svg, config, data: IEWChartProps['data']) {
+export function DrawTree(this: any, svg, config, data: IEWChartProps['data'], subscription) {
   const { width, height } = config;
   const svgEle = d3.select(svg);
   svgEle.attr('viewBox', [-width / 2, -height / 2, width, height]);
-  const treeData = deepClone(data.treeData);
+  const treeData = data.treeData;
+  // const treeData = deepClone(data.treeData);
+  addUniqueKey(treeData);
   const tree = d3.hierarchy(treeData);
   const treeLayout = d3.tree().nodeSize([120, 150])(tree);
   drawLinks(svg, treeLayout);
-  drawNodes(svg, treeLayout);
+  const res = drawNodes(svg, treeLayout, subscription);
+  this.nodeEles = res.nodeEles;
+  this.clear = res.clear;
 }
 
 function drawLinks(svg, treeLayout) {
@@ -34,13 +40,14 @@ function drawLinks(svg, treeLayout) {
   linkEle.selectAll('path.link').data(links).join('path').attr('class', 'link').attr('d', linkBezierCurve);
 }
 
-function drawNodes(svg, treeLayout) {
+function drawNodes(svg, treeLayout, subscription) {
   const svgEle = d3.select(svg);
   let nodeEle: any = svgEle.select('g.node_ele');
   if (nodeEle.empty()) {
     nodeEle = svgEle.append('g').attr('class', 'node_ele');
   }
   const nodes = treeLayout.descendants();
+  nodeEle.selectAll('g.node').remove();
   const nodeEles = nodeEle
     .selectAll('g.node')
     .data(nodes)
@@ -49,7 +56,7 @@ function drawNodes(svg, treeLayout) {
     .attr('transform', d => 'translate(' + d.x + ',' + d.y + ')');
   const nodeContent = nodeEles.append('g').attr('class', 'node_content');
   const nodeBox = nodeContent.append('g').attr('class', 'node_box');
-  const nodeIcon = nodeContent.append('g').attr('class', 'node_icon');
+  const nodeExtra = nodeContent.append('g').attr('class', 'node_extra');
   nodeBox
     .append('rect')
     .attr('rx', 5)
@@ -98,18 +105,26 @@ function drawNodes(svg, treeLayout) {
       }
     });
 
-  drawNodeHead(nodeIcon);
-  drawNodeBottom(nodeIcon);
-  drawNodeDeepIcon(nodeIcon);
-  drawNodeSpanIcon(svg, nodeIcon);
+  drawNodeHead(nodeExtra);
+  drawNodeBottom(nodeExtra);
+  const deepIconClear = drawNodeDeepIcon(svg, nodeExtra, subscription);
+  drawNodeSpanIcon(svg, nodeExtra);
+  const clear = () => {
+    deepIconClear();
+  };
+  return {
+    nodeEles,
+    clear,
+  };
 }
 
-function drawNodeDeepIcon(nodeIcon) {
+function drawNodeDeepIcon(svg, nodeExtra, subscription) {
+  const svgEle = d3.select(svg);
   const { minus, plus } = new IconPath();
-  const expandIcon = nodeIcon
+  const expandIcon = nodeExtra
     .filter(d => d.data.children || d.data._children)
     .append('g')
-    .attr('class', 'icon_box icon_box_deep')
+    .attr('class', 'nodeicon_deep')
     .style('cursor', 'pointer')
     .attr('fill', 'none')
     .attr('stroke', iconBg)
@@ -125,10 +140,27 @@ function drawNodeDeepIcon(nodeIcon) {
     .attr('cy', iconSize)
     .attr('r', iconSize)
     .attr('fill', iconBg)
-    .attr('opacity', 0.4);
+    .attr('opacity', 0.4)
+    .on('click', function (this: any, e, d) {
+      svgEle.select('g.node_tooltip').remove();
+      if (d.data.children || d.data._children) {
+        if (d.data.children) {
+          d.data._children = d.data.children;
+          d.data.children = null;
+          o.attr('d', plus);
+        } else {
+          d.data.children = d.data._children;
+          d.data._children = null;
+          o.attr('d', minus);
+        }
+        subscription.publish();
+      }
+    });
+  return () => expandIcon.on('.');
 }
 
-function drawNodeSpanIcon(svg, nodeIcon) {
+function drawNodeSpanIcon(svg, nodeExtra) {
+  const { minus, plus } = new IconPath();
   const svgEle = d3.select(svg);
   const needExpands = svgEle.selectAll('g.node').filter((d: any) => {
     if (d.parent && d.parent.data.originChildren && d.parent.data.originChildren.length > spanNum) {
@@ -138,10 +170,33 @@ function drawNodeSpanIcon(svg, nodeIcon) {
     }
     return false;
   });
+
+  console.log(1, needExpands);
+
+  const expandIcon = needExpands
+    .append('g')
+    .attr('class', 'nodeicon_span')
+    .style('cursor', 'pointer')
+    .attr('fill', 'none')
+    .attr('stroke', iconBg)
+    .attr('stroke-opacity', 1)
+    .attr('stroke-width', 1.5);
+  expandIcon
+    .append('path')
+    .attr('transform', 'translate(' + 70 + ',' + -26 + ')')
+    .attr('d', d => (d.parent.data.children.length === d.parent.data.originChildren.length ? minus : plus));
+  expandIcon
+    .append('circle')
+    .attr('cx', 0)
+    .attr('cy', iconSize)
+    .attr('r', iconSize)
+    .attr('transform', 'translate(' + 70 + ',' + (-26 - iconSize) + ')')
+    .attr('fill', iconBg)
+    .attr('opacity', 0.4);
 }
 
-function drawNodeHead(nodeIcon) {
-  const nodeHeadEle = nodeIcon.append('g').attr('class', 'node_head');
+function drawNodeHead(nodeExtra) {
+  const nodeHeadEle = nodeExtra.append('g').attr('class', 'node_head');
   nodeHeadEle
     .selectAll('g.node_head')
     .data(d => d.data.head)
@@ -153,8 +208,8 @@ function drawNodeHead(nodeIcon) {
     });
 }
 
-function drawNodeBottom(nodeIcon) {
-  const nodeBottomEle = nodeIcon.append('g').attr('class', 'node_bottom');
+function drawNodeBottom(nodeExtra) {
+  const nodeBottomEle = nodeExtra.append('g').attr('class', 'node_bottom');
   nodeBottomEle
     .selectAll('g.node_head')
     .data(d => d.data.bottom)
@@ -224,4 +279,33 @@ function deepClone(data: EWChartTreeData | undefined) {
   }
 
   return null;
+}
+
+function addUniqueKey(rootNode) {
+  rootNode.deepNum = 0;
+  const queue = [rootNode];
+  let deepNum = 0;
+  while (queue.length !== 0) {
+    const node = queue.pop();
+    node._key = v4();
+    if (node.deepNum !== undefined) {
+      deepNum = node.deepNum;
+    }
+    if (node.children) {
+      ++deepNum;
+      node.children.forEach(child => {
+        child.deepNum = deepNum;
+      });
+      queue.push(...node.children);
+      node.originChildren = node.children;
+      if (node.children.length > spanNum) {
+        node.children = node.children.slice(0, spanNum);
+      }
+      if (deepNum > userDeepNum) {
+        node._children = node.children;
+        node.children = null;
+      }
+    }
+  }
+  return rootNode;
 }

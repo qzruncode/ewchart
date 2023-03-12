@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ConfigContext } from '..';
 import { DrawTree } from '../toolkit/tree';
+import TreeMove from '../toolkit/treemove';
 
-function PieChart({ data, id, subscription }) {
+function TreeChart({ data, id, subscription }) {
   const svgRef = useRef(null);
   const config = useContext(ConfigContext);
   const [chartConfig, setChartConfig] = useState(config);
@@ -29,20 +30,20 @@ function PieChart({ data, id, subscription }) {
   }, []);
 
   useEffect(() => {
-    // let pieMove;
+    let treeMove;
+    let drawTree;
     if (chartConfig.width != undefined && svgRef.current != null) {
-      const drawTree = new DrawTree(svgRef.current, chartConfig, data);
-      // if (chartConfig.onMove) {
-      //   drawPieShadow(svgRef.current);
-      //   pieMove = new PieMove(drawPie.pie, chartConfig);
-      // }
+      drawTree = new DrawTree(svgRef.current, chartConfig, data, subscription);
+      treeMove = new TreeMove(svgRef.current, drawTree.nodeEles, chartConfig);
     }
-    // return () => {
-    //   pieMove && pieMove.clear && pieMove.clear();
-    // };
+    console.log(2, data);
+    return () => {
+      treeMove && treeMove.clear && treeMove.clear();
+      drawTree && drawTree.clear && drawTree.clear();
+    };
   }, [chartConfig, svgRef.current, data]);
 
   return <svg ref={svgRef} preserveAspectRatio="xMinYMin meet" width="100%" height={chartConfig.height}></svg>;
 }
 
-export default PieChart;
+export default TreeChart;

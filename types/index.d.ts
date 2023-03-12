@@ -34,6 +34,7 @@ export interface EWChartTreeData {
   name: string;
   head?: string[];
   bottom?: string[];
+  tooltip?: { [name: string]: string };
   children?: Array<EWChartTreeData>;
 }
 
