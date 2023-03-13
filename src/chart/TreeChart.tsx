@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ConfigContext } from '..';
 import { DrawTree } from '../toolkit/tree';
 import TreeMove from '../toolkit/treemove';
+import { zoom } from '../toolkit/zoom';
 
 function TreeChart({ data, id, subscription }) {
   const svgRef = useRef(null);
@@ -32,14 +33,16 @@ function TreeChart({ data, id, subscription }) {
   useEffect(() => {
     let treeMove;
     let drawTree;
+    let treeZoom;
     if (chartConfig.width != undefined && svgRef.current != null) {
       drawTree = new DrawTree(svgRef.current, chartConfig, data, subscription);
       treeMove = new TreeMove(svgRef.current, drawTree.nodeEles, chartConfig);
+      treeZoom = zoom(svgRef.current);
     }
-    console.log(2, data);
     return () => {
       treeMove && treeMove.clear && treeMove.clear();
       drawTree && drawTree.clear && drawTree.clear();
+      treeZoom && treeZoom.clear && treeZoom.clear();
     };
   }, [chartConfig, svgRef.current, data]);
 

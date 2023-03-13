@@ -14,22 +14,26 @@ export function DrawTree(this: any, svg, config, data: IEWChartProps['data'], su
   const { width, height } = config;
   const svgEle = d3.select(svg);
   svgEle.attr('viewBox', [-width / 2, -height / 2, width, height]);
+  let treeEle: any = svgEle.select('g.tree_box');
+  if (treeEle.empty()) {
+    treeEle = svgEle.append('g').attr('class', 'tree_box');
+  }
   const treeData = data.treeData;
   // const treeData = deepClone(data.treeData);
   addUniqueKey(treeData);
+  console.log('执行了', treeData);
   const tree = d3.hierarchy(treeData);
   const treeLayout = d3.tree().nodeSize([120, 150])(tree);
-  drawLinks(svg, treeLayout);
-  const res = drawNodes(svg, treeLayout, subscription);
+  drawLinks(treeEle, treeLayout);
+  const res = drawNodes(treeEle, treeLayout, subscription);
   this.nodeEles = res.nodeEles;
   this.clear = res.clear;
 }
 
-function drawLinks(svg, treeLayout) {
-  const svgEle = d3.select(svg);
-  let linkEle: any = svgEle.select('g.link_ele');
+function drawLinks(treeEle, treeLayout) {
+  let linkEle: any = treeEle.select('g.link_ele');
   if (linkEle.empty()) {
-    linkEle = svgEle
+    linkEle = treeEle
       .append('g')
       .attr('class', 'link_ele')
       .attr('fill', 'none')
@@ -40,11 +44,10 @@ function drawLinks(svg, treeLayout) {
   linkEle.selectAll('path.link').data(links).join('path').attr('class', 'link').attr('d', linkBezierCurve);
 }
 
-function drawNodes(svg, treeLayout, subscription) {
-  const svgEle = d3.select(svg);
-  let nodeEle: any = svgEle.select('g.node_ele');
+function drawNodes(treeEle, treeLayout, subscription) {
+  let nodeEle: any = treeEle.select('g.node_ele');
   if (nodeEle.empty()) {
-    nodeEle = svgEle.append('g').attr('class', 'node_ele');
+    nodeEle = treeEle.append('g').attr('class', 'node_ele');
   }
   const nodes = treeLayout.descendants();
   nodeEle.selectAll('g.node').remove();
@@ -76,39 +79,12 @@ function drawNodes(svg, treeLayout, subscription) {
     keyTimes="0 ; 0.5 ; 1" />`
         : ''
     );
-  nodeBox
-    .append('text')
-    .style('cursor', 'pointer')
-    .attr('dy', '0.31em')
-    .attr('y', -25)
-    .attr('text-anchor', 'middle')
-    .text(d => d.data.name)
-    .attr('stroke', 'none')
-    .attr('fill', 'black')
-    .on('click', e => {
-      // const eleData = d3.select(e.target).data();
-      // if (eleData && eleData[0]) {
-      //   const data = eleData[0].data;
-      //   this.extraCallback.click(`${data.reqId}$$${data.rpcId}`);
-      // }
-    })
-    .call(text => {
-      const { width } = text.node().getBBox();
-      if (width > rectWidth) {
-        const sliceWidth = rectWidth * 0.8;
-        const originLength = text.text().length;
-        const sliceLength = originLength / (width / sliceWidth) - 3;
-        const sliceText = text.text().slice(0, sliceLength) + '...';
-        text.attr('ot', text.text());
-        text.attr('st', sliceText);
-        text.text(sliceText);
-      }
-    });
 
+  drawNodeName(nodeBox);
   drawNodeHead(nodeExtra);
   drawNodeBottom(nodeExtra);
-  const deepIconClear = drawNodeDeepIcon(svg, nodeExtra, subscription);
-  drawNodeSpanIcon(svg, nodeExtra);
+  const deepIconClear = drawNodeDeepIcon(treeEle, nodeExtra, subscription);
+  drawNodeSpanIcon(treeEle, subscription);
   const clear = () => {
     deepIconClear();
   };
@@ -118,8 +94,7 @@ function drawNodes(svg, treeLayout, subscription) {
   };
 }
 
-function drawNodeDeepIcon(svg, nodeExtra, subscription) {
-  const svgEle = d3.select(svg);
+function drawNodeDeepIcon(treeEle, nodeExtra, subscription) {
   const { minus, plus } = new IconPath();
   const expandIcon = nodeExtra
     .filter(d => d.data.children || d.data._children)
@@ -142,7 +117,7 @@ function drawNodeDeepIcon(svg, nodeExtra, subscription) {
     .attr('fill', iconBg)
     .attr('opacity', 0.4)
     .on('click', function (this: any, e, d) {
-      svgEle.select('g.node_tooltip').remove();
+      treeEle.select('g.node_tooltip').remove();
       if (d.data.children || d.data._children) {
         if (d.data.children) {
           d.data._children = d.data.children;
@@ -159,10 +134,9 @@ function drawNodeDeepIcon(svg, nodeExtra, subscription) {
   return () => expandIcon.on('.');
 }
 
-function drawNodeSpanIcon(svg, nodeExtra) {
+function drawNodeSpanIcon(treeEle, subscription) {
   const { minus, plus } = new IconPath();
-  const svgEle = d3.select(svg);
-  const needExpands = svgEle.selectAll('g.node').filter((d: any) => {
+  const needExpands = treeEle.selectAll('g.node').filter((d: any) => {
     if (d.parent && d.parent.data.originChildren && d.parent.data.originChildren.length > spanNum) {
       if (d.parent.data.children[d.parent.data.children.length - 1] === d.data) {
         return true;
@@ -170,8 +144,6 @@ function drawNodeSpanIcon(svg, nodeExtra) {
     }
     return false;
   });
-
-  console.log(1, needExpands);
 
   const expandIcon = needExpands
     .append('g')
@@ -181,18 +153,80 @@ function drawNodeSpanIcon(svg, nodeExtra) {
     .attr('stroke', iconBg)
     .attr('stroke-opacity', 1)
     .attr('stroke-width', 1.5);
+
+  const nodeWidth = rectWidth + 20;
+  const nodeHeight = rectHeight + 10;
+  expandIcon
+    .append('rect')
+    .attr('transform', function (d: any) {
+      const [minX, maxX] = d3.extent(d.parent.children, (d: any) => d.x) as Array<any>;
+      return 'translate(' + -(maxX - minX + nodeWidth / 2) + ',' + -nodeHeight + ')';
+    })
+    .attr('rx', 5)
+    .attr('ry', 5)
+    .attr('stroke-dasharray', '5,5')
+    .attr('width', (d: any) => {
+      const [minX, maxX] = d3.extent(d.parent.children, (d: any) => d.x) as Array<any>;
+      return maxX - minX + nodeWidth;
+    })
+    .attr('height', nodeHeight + 10);
+
   expandIcon
     .append('path')
-    .attr('transform', 'translate(' + 70 + ',' + -26 + ')')
-    .attr('d', d => (d.parent.data.children.length === d.parent.data.originChildren.length ? minus : plus));
+    .attr('transform', 'translate(' + (rectWidth / 2 + iconSize + 10) + ',' + -rectHeight / 2 + ')')
+    .attr('d', (d: any) => (d.parent.data.children.length === d.parent.data.originChildren.length ? minus : plus));
   expandIcon
     .append('circle')
     .attr('cx', 0)
     .attr('cy', iconSize)
     .attr('r', iconSize)
-    .attr('transform', 'translate(' + 70 + ',' + (-26 - iconSize) + ')')
+    .attr('transform', 'translate(' + (rectWidth / 2 + iconSize + 10) + ',' + (-rectHeight / 2 - iconSize) + ')')
     .attr('fill', iconBg)
-    .attr('opacity', 0.4);
+    .attr('opacity', 0.4)
+    .on('click', function (this: any, e, d: any) {
+      treeEle.select('g.node_tooltip').remove();
+      d3.select(this.parentElement).remove();
+      if (d.parent.data.children.length === d.parent.data.originChildren.length) {
+        d.parent.data.children = d.parent.data.originChildren.slice(0, spanNum);
+      } else {
+        d.parent.data.children = [...d.parent.data.originChildren];
+      }
+      subscription.publish();
+    });
+}
+
+function drawNodeName(nodeBox) {
+  const textEle = nodeBox.append('text');
+  textEle
+    .style('cursor', 'pointer')
+    .attr('dy', '0.31em')
+    .attr('y', -25)
+    .attr('text-anchor', 'middle')
+    .text(d => d.data.name)
+    .attr('stroke', 'none')
+    .attr('fill', 'black')
+    .on('click', e => {
+      // const eleData = d3.select(e.target).data();
+      // if (eleData && eleData[0]) {
+      //   const data = eleData[0].data;
+      //   this.extraCallback.click(`${data.reqId}$$${data.rpcId}`);
+      // }
+    })
+    .call(texts => {
+      texts.each(function (this: any) {
+        const text = d3.select(this);
+        const { width } = this.getBBox();
+        if (width > rectWidth) {
+          const sliceWidth = rectWidth * 0.8;
+          const originLength = text.text().length;
+          const sliceLength = originLength / (width / sliceWidth) - 3;
+          const sliceText = text.text().slice(0, sliceLength) + '...';
+          text.attr('ot', text.text());
+          text.attr('st', sliceText);
+          text.text(sliceText);
+        }
+      });
+    });
 }
 
 function drawNodeHead(nodeExtra) {
@@ -287,6 +321,7 @@ function addUniqueKey(rootNode) {
   let deepNum = 0;
   while (queue.length !== 0) {
     const node = queue.pop();
+    if (node.originChildren != null) return;
     node._key = v4();
     if (node.deepNum !== undefined) {
       deepNum = node.deepNum;

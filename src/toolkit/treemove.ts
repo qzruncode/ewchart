@@ -55,9 +55,10 @@ const triangleSize = 5;
 
 function drawNodeInfo(svg, pos, tooltip) {
   const svgEle = d3.select(svg);
-  let nodeTooltipEle: any = svgEle.select('g.node_tooltip');
+  const treeEle = svgEle.select('.tree_box');
+  let nodeTooltipEle: any = treeEle.select('g.node_tooltip');
   if (nodeTooltipEle.empty()) {
-    nodeTooltipEle = svgEle
+    nodeTooltipEle = treeEle
       .append('g')
       .attr('class', 'node_tooltip')
       .attr('transform', `translate(${(Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER)})`);
