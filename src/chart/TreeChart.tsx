@@ -1,10 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ConfigContext } from '..';
-import { DrawTree } from '../toolkit/tree';
+import { drawTreeNodeShadow } from '../toolkit/shadow';
+import { drawTree } from '../toolkit/tree';
 import TreeMove from '../toolkit/treemove';
 import { zoom } from '../toolkit/zoom';
 
-function TreeChart({ data, id, subscription }) {
+let globalDrawTree;
+let globalTreeZoom;
+function TreeChart({ data, id, subscription, treeConfig }) {
   const svgRef = useRef(null);
   const config = useContext(ConfigContext);
   const [chartConfig, setChartConfig] = useState(config);
@@ -32,19 +35,30 @@ function TreeChart({ data, id, subscription }) {
 
   useEffect(() => {
     let treeMove;
-    let drawTree;
+    let drawTreeRes;
     let treeZoom;
     if (chartConfig.width != undefined && svgRef.current != null) {
-      drawTree = new DrawTree(svgRef.current, chartConfig, data, subscription);
-      treeMove = new TreeMove(svgRef.current, drawTree.nodeEles, chartConfig);
+      drawTreeRes = drawTree(svgRef.current, chartConfig, data, subscription);
+      globalDrawTree = drawTreeRes;
+      treeMove = new TreeMove(svgRef.current, drawTreeRes.nodeEles, chartConfig);
       treeZoom = zoom(svgRef.current);
+      globalTreeZoom = treeZoom;
+      drawTreeNodeShadow(svgRef.current);
     }
     return () => {
       treeMove && treeMove.clear && treeMove.clear();
-      drawTree && drawTree.clear && drawTree.clear();
+      drawTreeRes && drawTreeRes.clear && drawTreeRes.clear();
       treeZoom && treeZoom.clear && treeZoom.clear();
+      globalDrawTree = null;
+      globalTreeZoom = null;
     };
   }, [chartConfig, svgRef.current, data]);
+
+  useEffect(() => {
+    treeConfig.lineType && globalDrawTree && globalDrawTree.redrawLinks && globalDrawTree.redrawLinks(treeConfig);
+    treeConfig.center && globalTreeZoom && globalTreeZoom.center && globalTreeZoom.center();
+    treeConfig.expand && globalDrawTree && globalDrawTree.expand && globalDrawTree.expand(treeConfig);
+  }, [treeConfig]);
 
   return <svg ref={svgRef} preserveAspectRatio="xMinYMin meet" width="100%" height={chartConfig.height}></svg>;
 }

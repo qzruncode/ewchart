@@ -70,6 +70,11 @@ export interface IEWChartProps {
       min: number;
     };
   };
+  treeConfig?: {
+    lineType: 'linkBezierCurve' | 'linkBroken' | 'linkStraight' | string;
+    center?: boolean;
+    type?: 'span' | 'deep' | 'all';
+  };
 }
 
 function EWChart(props: IEWChartProps): React.ReactElement;

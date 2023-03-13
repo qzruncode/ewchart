@@ -8,12 +8,12 @@ const rectWidth = 100;
 const rectHeight = 55;
 const iconBg = '#ccc';
 const spanNum = 3;
-const userDeepNum = 3;
+const userDeepNum = 1;
 
-export function DrawTree(this: any, svg, config, data: IEWChartProps['data'], subscription) {
+export function drawTree(this: any, svg, config, data: IEWChartProps['data'], subscription) {
   const { width, height } = config;
   const svgEle = d3.select(svg);
-  svgEle.attr('viewBox', [-width / 2, -height / 2, width, height]);
+  svgEle.attr('viewBox', [-width / 2, -rectHeight - 20, width, height]);
   let treeEle: any = svgEle.select('g.tree_box');
   if (treeEle.empty()) {
     treeEle = svgEle.append('g').attr('class', 'tree_box');
@@ -24,13 +24,18 @@ export function DrawTree(this: any, svg, config, data: IEWChartProps['data'], su
   console.log('执行了', treeData);
   const tree = d3.hierarchy(treeData);
   const treeLayout = d3.tree().nodeSize([120, 150])(tree);
-  drawLinks(treeEle, treeLayout);
+  drawLinks(treeEle, treeLayout, config);
   const res = drawNodes(treeEle, treeLayout, subscription);
-  this.nodeEles = res.nodeEles;
-  this.clear = res.clear;
+
+  return {
+    nodeEles: res.nodeEles,
+    clear: res.clear,
+    redrawLinks: config => drawLinks(treeEle, treeLayout, config),
+    expand: config => reExpand(treeEle, subscription, config),
+  };
 }
 
-function drawLinks(treeEle, treeLayout) {
+function drawLinks(treeEle, treeLayout, config) {
   let linkEle: any = treeEle.select('g.link_ele');
   if (linkEle.empty()) {
     linkEle = treeEle
@@ -41,7 +46,14 @@ function drawLinks(treeEle, treeLayout) {
       .attr('stroke-width', 1.5);
   }
   const links = treeLayout.links();
-  linkEle.selectAll('path.link').data(links).join('path').attr('class', 'link').attr('d', linkBezierCurve);
+  const linkPath = linkEle.selectAll('path.link').data(links).join('path').attr('class', 'link');
+  if (config.lineType === 'linkBroken') {
+    linkPath.attr('d', linkBroken);
+  } else if (config.lineType === 'linkStraight') {
+    linkPath.attr('d', linkStraight);
+  } else {
+    linkPath.attr('d', linkBezierCurve);
+  }
 }
 
 function drawNodes(treeEle, treeLayout, subscription) {
@@ -64,7 +76,7 @@ function drawNodes(treeEle, treeLayout, subscription) {
     .append('rect')
     .attr('rx', 5)
     .attr('ry', 5)
-    // .attr('filter', 'url(#fds1)')
+    .attr('filter', 'url(#fds)')
     .attr('stroke', 'black')
     .attr('stroke-width', '0.5')
     .attr('fill', d => (d.data.error ? 'pink' : 'white'))
@@ -290,6 +302,93 @@ function linkBezierCurve(d) {
   path.bezierCurveTo(x0, y0 + r / 2, x1, y0 + r / 2, x1, y1);
 
   return path.toString();
+}
+
+function linkStraight(d) {
+  const path = d3.path();
+  const x0 = d.source.x,
+    y0 = d.source.y + iconSize * 2,
+    x1 = d.target.x,
+    y1 = d.target.y - 55;
+
+  path.moveTo(x0, y0);
+  path.lineTo(x1, y1);
+  return path.toString();
+}
+
+function linkBroken(d) {
+  const path = d3.path();
+  const x0 = d.source.x,
+    y0 = d.source.y + iconSize * 2,
+    x1 = d.target.x,
+    y1 = d.target.y - 55;
+
+  const yOffset = y1 - y0;
+  // 父节点，连接最左边的节点 和 最右边的节点
+  const first = d.source.children[0];
+  const last = d.source.children[d.source.children.length - 1];
+  if (!d.source.childLine) {
+    if (first !== last) {
+      d.source.childLine = true; // 已经画了就不再画
+      path.moveTo(x0, y0);
+      path.lineTo(x0, y0 + yOffset / 3); // 画竖线
+      const first_x = first.x;
+      path.lineTo(first_x, y0 + yOffset / 3); // 画左横线
+      path.moveTo(x0, y0 + yOffset / 3);
+      const last_x = last.x;
+      path.lineTo(last_x, y0 + yOffset / 3); // 画右横线
+    } else {
+      d.source.childLine = true;
+      path.moveTo(x0, y0);
+      path.lineTo(x0, y0 + yOffset / 3); // 画竖线
+    }
+  }
+  path.moveTo(x1, y1 - (yOffset * 2) / 3);
+  path.lineTo(x1, y1); // 连接父横线
+  delete d.source.childLine;
+  return path.toString();
+}
+
+function reExpand(treeEle, subscription, config) {
+  const { minus } = new IconPath();
+  if (config.expand === 'span') {
+    treeEle.select('g.node_tooltip').remove();
+    treeEle.selectAll('g.nodeicon_span').remove();
+
+    treeEle.selectAll('g.node').each(function (this: any, d) {
+      if (d.parent && d.parent.data.originChildren) {
+        d.parent.data.children = [...d.parent.data.originChildren];
+      }
+    });
+    subscription.publish();
+  } else if (config.expand === 'deep') {
+    treeEle.select('g.node_tooltip').remove();
+    treeEle.selectAll('g.node').each(function (this: any, d) {
+      if (!d.data.children && d.data._children) {
+        d.data.children = d.data._children;
+        d.data._children = null;
+        d3.select(this).select('.nodeicon_deep path').attr('d', minus);
+      }
+    });
+    subscription.publish();
+  } else if (config.expand === 'all') {
+    treeEle.select('g.node_tooltip').remove();
+    treeEle.selectAll('g.nodeicon_span').remove();
+    treeEle.selectAll('g.nodeicon_deep').remove();
+    treeEle.selectAll('g.node').each(function (this: any, d) {
+      if (d.data.children || d.data._children) {
+        if (!d.data.children && d.data._children) {
+          d.data.children = d.data._children;
+          d.data._children = null;
+        }
+
+        if (d.data.originChildren && d.data.children.length < d.data.originChildren.length) {
+          d.data.children = [...d.data.originChildren];
+        }
+      }
+    });
+    subscription.publish();
+  }
 }
 
 function deepClone(data: EWChartTreeData | undefined) {

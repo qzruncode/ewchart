@@ -67,12 +67,11 @@ function EWChart(props: IEWChartProps) {
       case 'histogram':
         return <Histogram data={props.data} id={id} subscription={subscription} />;
       case 'tree':
-        return <TreeChart data={props.data} id={id} subscription={subscription} />;
+        return <TreeChart data={props.data} id={id} subscription={subscription} treeConfig={props.treeConfig} />;
       default:
         return null;
     }
   };
-
   return (
     <div className={id + (props.className ? ` ${props.className}` : '')} style={props.style ? props.style : undefined}>
       {props.data.groups && props.data.groups.length === 0 && props.data.treeData == undefined ? (

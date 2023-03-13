@@ -7,7 +7,9 @@ export function zoom(svg) {
   }
   const zoom = d3.zoom().scaleExtent([0.01, 20]).on('zoom', zoomed);
   svgEle.call(zoom);
-  return () => {
-    zoom.on('.');
+
+  return {
+    clear: () => zoom.on('.'),
+    center: () => zoom.transform(svgEle, d3.zoomIdentity),
   };
 }
