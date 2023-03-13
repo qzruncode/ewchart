@@ -28,6 +28,9 @@ export interface EWChartData {
   pointType?: 'fill' | 'stroke';
   pointSize?: number;
   treeData?: EWChartTreeData;
+  spanDepth?: number;
+  depDepth?: number;
+  fixed?: boolean;
 }
 
 export interface EWChartTreeData {
@@ -36,6 +39,7 @@ export interface EWChartTreeData {
   bottom?: string[];
   tooltip?: { [name: string]: string };
   children?: Array<EWChartTreeData>;
+  error?: boolean;
 }
 
 export interface IEWChartProps {
@@ -57,6 +61,7 @@ export interface IEWChartProps {
       position: { x: number; y: number }
     ) => void;
     onSelect?: (dateRange: Date[]) => void;
+    onClick?: (data: any) => void;
   };
   interactive?: {
     group?: string;
@@ -74,6 +79,9 @@ export interface IEWChartProps {
     lineType: 'linkBezierCurve' | 'linkBroken' | 'linkStraight' | string;
     center?: boolean;
     type?: 'span' | 'deep' | 'all';
+    chartBg?: string;
+    linkBg?: string;
+    btnBg?: string;
   };
 }
 

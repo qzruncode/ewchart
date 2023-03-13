@@ -1,7 +1,10 @@
 import * as d3 from 'd3';
 
-export default function TreeMove(this: any, svg, nodeEles, config) {
-  const { width, height } = config;
+const iconSize = 8;
+const rectWidth = 100;
+const triangleSize = 5;
+
+export default function TreeMove(this: any, svg, nodeEles, data) {
   if ('ontouchstart' in document) {
     nodeEles.select('g.node_box').on('touchstart', entered).on('touchmove', moved).on('touchend', leaved);
   } else {
@@ -13,23 +16,14 @@ export default function TreeMove(this: any, svg, nodeEles, config) {
   }
 
   function moved(this: any, event, data) {
-    // console.log(this, event, data);
     drawNodeInfo(svg, [data.x, data.y], data.data.tooltip);
-    // const pie = d3.select(this);
-    // pie.style('transform', 'scale(1.05)');
-    // if (config.mouse.shadow) {
-    //   pie.attr('filter', 'url(#fds)');
-    // }
-    // const position = d3.pointer(event);
-    // const point = {
-    //   color: data.data.color,
-    //   label: data.data.label,
-    //   value: data.data.value,
-    // };
-    // config.onMove && config.onMove('move', [point], { x: position[0] + width / 2, y: position[1] + height / 2 });
   }
 
   function leaved(this: any, event) {
+    console.log(data);
+    if (data.fixed !== true) {
+      d3.select(svg).select('g.node_tooltip').remove();
+    }
     // const pie = d3.select(this);
     // pie.style('transform', 'none');
     // if (config.mouse.shadow) {
@@ -44,14 +38,6 @@ export default function TreeMove(this: any, svg, nodeEles, config) {
 
   this.clear = clear;
 }
-
-const linkBg = '#000';
-const iconSize = 8;
-const rectWidth = 100;
-const rectHeight = 55;
-const iconBg = '#ccc';
-const spanNum = 3;
-const triangleSize = 5;
 
 function drawNodeInfo(svg, pos, tooltip) {
   const svgEle = d3.select(svg);

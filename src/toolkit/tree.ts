@@ -7,8 +7,8 @@ const iconSize = 8;
 const rectWidth = 100;
 const rectHeight = 55;
 const iconBg = '#ccc';
-const spanNum = 3;
-const userDeepNum = 1;
+let spanNum = 3;
+let userDeepNum = 1;
 
 export function drawTree(this: any, svg, config, data: IEWChartProps['data'], subscription) {
   const { width, height } = config;
@@ -19,19 +19,28 @@ export function drawTree(this: any, svg, config, data: IEWChartProps['data'], su
     treeEle = svgEle.append('g').attr('class', 'tree_box');
   }
   const treeData = data.treeData;
-  // const treeData = deepClone(data.treeData);
+  spanNum = data.spanDepth != undefined ? data.spanDepth : 3;
+  userDeepNum = data.depDepth != undefined ? data.depDepth : 1;
   addUniqueKey(treeData);
-  console.log('执行了', treeData);
   const tree = d3.hierarchy(treeData);
   const treeLayout = d3.tree().nodeSize([120, 150])(tree);
   drawLinks(treeEle, treeLayout, config);
-  const res = drawNodes(treeEle, treeLayout, subscription);
+  const res = drawNodes(treeEle, treeLayout, subscription, config);
 
   return {
     nodeEles: res.nodeEles,
     clear: res.clear,
     redrawLinks: config => drawLinks(treeEle, treeLayout, config),
     expand: config => reExpand(treeEle, subscription, config),
+    changeBg: config => svgEle.style('background', config.chartBg),
+    changeLinkBg: config => svgEle.selectAll('g.link_ele').attr('stroke', config.linkBg),
+    changeBtnBg: config => {
+      svgEle
+        .selectAll('g.nodeicon_deep,g.nodeicon_span,g.nodeicon_span>rect')
+        .attr('stroke', config.btnBg)
+        .selectAll('circle')
+        .attr('fill', config.btnBg);
+    },
   };
 }
 
@@ -56,7 +65,7 @@ function drawLinks(treeEle, treeLayout, config) {
   }
 }
 
-function drawNodes(treeEle, treeLayout, subscription) {
+function drawNodes(treeEle, treeLayout, subscription, config) {
   let nodeEle: any = treeEle.select('g.node_ele');
   if (nodeEle.empty()) {
     nodeEle = treeEle.append('g').attr('class', 'node_ele');
@@ -68,7 +77,11 @@ function drawNodes(treeEle, treeLayout, subscription) {
     .data(nodes)
     .join('g')
     .attr('class', 'node')
-    .attr('transform', d => 'translate(' + d.x + ',' + d.y + ')');
+    .attr('transform', d => 'translate(' + d.x + ',' + d.y + ')')
+    .on('click', function (this: any) {
+      const d = d3.select(this).data()[0].data;
+      config.onClick && config.onClick(d);
+    });
   const nodeContent = nodeEles.append('g').attr('class', 'node_content');
   const nodeBox = nodeContent.append('g').attr('class', 'node_box');
   const nodeExtra = nodeContent.append('g').attr('class', 'node_extra');

@@ -40,10 +40,11 @@ function TreeChart({ data, id, subscription, treeConfig }) {
     if (chartConfig.width != undefined && svgRef.current != null) {
       drawTreeRes = drawTree(svgRef.current, chartConfig, data, subscription);
       globalDrawTree = drawTreeRes;
-      treeMove = new TreeMove(svgRef.current, drawTreeRes.nodeEles, chartConfig);
+      treeMove = new TreeMove(svgRef.current, drawTreeRes.nodeEles, data);
       treeZoom = zoom(svgRef.current);
       globalTreeZoom = treeZoom;
       drawTreeNodeShadow(svgRef.current);
+      initChartConfig();
     }
     return () => {
       treeMove && treeMove.clear && treeMove.clear();
@@ -58,7 +59,14 @@ function TreeChart({ data, id, subscription, treeConfig }) {
     treeConfig.lineType && globalDrawTree && globalDrawTree.redrawLinks && globalDrawTree.redrawLinks(treeConfig);
     treeConfig.center && globalTreeZoom && globalTreeZoom.center && globalTreeZoom.center();
     treeConfig.expand && globalDrawTree && globalDrawTree.expand && globalDrawTree.expand(treeConfig);
+    initChartConfig();
   }, [treeConfig]);
+
+  const initChartConfig = () => {
+    treeConfig.chartBg && globalDrawTree && globalDrawTree.changeBg(treeConfig);
+    treeConfig.linkBg && globalDrawTree && globalDrawTree.changeLinkBg(treeConfig);
+    treeConfig.btnBg && globalDrawTree && globalDrawTree.changeBtnBg(treeConfig);
+  };
 
   return <svg ref={svgRef} preserveAspectRatio="xMinYMin meet" width="100%" height={chartConfig.height}></svg>;
 }

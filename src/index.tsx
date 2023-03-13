@@ -18,6 +18,7 @@ const defaultConfig = {
   width: undefined,
   onMove: null,
   onSelect: null,
+  onClick: null,
   group: undefined,
   mouse: null,
   select: null,
