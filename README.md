@@ -3,3 +3,16 @@
 2. 支持的图形类别：折线图、面积图、饼图、直方图、散点图、树形图
 3. 未来的计划：持续提供更多的绘图功能
 4. 如果你的项目还有很多特殊绘图功能ewchart无法实现的，你可以下载ewchart源码，自行修改
+
+## 使用方式
+
++ 参考[ewchart-base-template](https://www.npmjs.com/package/ewchart-base-template)
+
+## demo图
+<img width="1200" src="http://qzruncode.github.io/image/line.jpg" alt="line" >
+<img width="1200" src="http://qzruncode.github.io/image/arealine.jpg" alt="arealine" >
+<img width="1200" src="http://qzruncode.github.io/image/coor.jpg" alt="coor" >
+<img width="1200" src="http://qzruncode.github.io/image/bar.jpg" alt="bar" >
+<img width="1200" src="http://qzruncode.github.io/image/pie.jpg" alt="pie" >
+<img width="1200" src="http://qzruncode.github.io/image/tree.jpg" alt="tree" >
+<img width="1200" src="http://qzruncode.github.io/image/point.jpg" alt="point" >
