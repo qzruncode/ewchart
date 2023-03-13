@@ -34,7 +34,7 @@ export function DrawHistogram(
   const svgEle = d3.select(svg);
   let histogramEle;
 
-  const groupLens = data.groups[0].values ? data.groups[0].values.length : 0;
+  const groupLens = data.groups && data.groups[0].values ? data.groups[0].values.length : 0;
   const maxWidth = data.maxWidth ? data.maxWidth : 50;
   const barWidth = Math.min(xAixs.func.bandwidth(), maxWidth);
   const barGap = (xAixs.func.bandwidth() - barWidth * groupLens) / 2;

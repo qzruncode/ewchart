@@ -85,7 +85,7 @@ export default function HistogramMove(this: any, svg, drawHistogram, config, dat
   function moved(this: any, event, value) {
     const position = d3.pointer(event);
     const i = Number(d3.select(this).attr('i'));
-    const d = data.groups[i];
+    const d = (data.groups as any)[i];
     const point = {
       color: d.color,
       label: d.label,

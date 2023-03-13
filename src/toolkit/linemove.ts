@@ -5,7 +5,7 @@ import { IEWChartProps } from '../../types';
 function DrawCross(this: any, svg, config) {
   const svgEle = d3.select(svg);
   const { height } = config;
-  let xcrossEle = svgEle.select('line.xcross');
+  let xcrossEle: any = svgEle.select('line.xcross');
   if (xcrossEle.empty()) {
     xcrossEle = svgEle
       .append('line')
@@ -18,7 +18,7 @@ function DrawCross(this: any, svg, config) {
       .attr('class', 'xcross');
   }
 
-  let ycrossEle = svgEle.select('g.ycross');
+  let ycrossEle: any = svgEle.select('g.ycross');
   if (ycrossEle.empty()) {
     ycrossEle = svgEle.append('g').attr('class', 'ycross');
     ycrossEle.append('path').attr('class', 'ycross_line').attr('stroke', 'red').attr('stroke-dasharray', '3,3');
@@ -59,19 +59,22 @@ function MoveCross(this: any, cross, config, position, xAixs, yAixs) {
 function DrawCircle(this: any, svg, config, moveCross, yAixs, data: IEWChartProps['data']) {
   const svgEle = d3.select(svg);
   const ys: Array<{ x: number; y: number; c: string | undefined; label: string; value: number | null }> = [];
-  data.groups.forEach(group => {
-    const value = group.values[moveCross.xIndex];
-    const y = yAixs.func(value); // y坐标
-    if (y !== undefined) {
-      ys.push({
-        x: moveCross.x,
-        y,
-        c: group.color,
-        label: group.label,
-        value,
-      });
-    }
-  });
+  data.groups &&
+    data.groups.forEach(group => {
+      if (group.values) {
+        const value = group.values[moveCross.xIndex];
+        const y = yAixs.func(value); // y坐标
+        if (y !== undefined) {
+          ys.push({
+            x: moveCross.x,
+            y,
+            c: group.color,
+            label: group.label,
+            value,
+          });
+        }
+      }
+    });
 
   svgEle.selectAll('.dot').remove();
   svgEle
@@ -85,7 +88,7 @@ function DrawCircle(this: any, svg, config, moveCross, yAixs, data: IEWChartProp
     .attr('cy', d => d.y)
     .attr('r', data.pointSize != undefined ? data.pointSize * 1.2 : 3.5)
     .attr('fill', 'none')
-    .attr('stroke', d => d.c);
+    .attr('stroke', d => (d.c ? d.c : 'none'));
 
   this.circles = svgEle.selectAll('.dot');
   this.points = ys;

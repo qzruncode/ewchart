@@ -8,7 +8,7 @@ export function DrawPie(this: any, svg, config, data: IEWChartProps['data']) {
     .pie()
     .sort(null)
     .value((d: any) => d.value);
-  const arcs = pie(data.groups);
+  const arcs = pie(data.groups as any);
   let radius;
   if (width <= height) {
     radius = (width - left - right) / 2;
@@ -16,7 +16,7 @@ export function DrawPie(this: any, svg, config, data: IEWChartProps['data']) {
     radius = (height - bottom - top) / 2;
   }
 
-  let pieEle = svgEle.select('g.pie_ele');
+  let pieEle: any = svgEle.select('g.pie_ele');
   if (pieEle.empty()) {
     pieEle = svgEle.append('g').attr('class', 'pie_ele');
   }

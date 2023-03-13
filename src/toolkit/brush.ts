@@ -12,7 +12,7 @@ export function DrawBrush(
 ) {
   const { left, right, width, height, bottom, top } = config;
   const svgEle = d3.select(svg);
-  let brushEle = svgEle.select('g.brush_ele');
+  let brushEle: any = svgEle.select('g.brush_ele');
   if (brushEle.empty()) {
     brushEle = svgEle.append('g').attr('class', 'brush_ele');
   }

@@ -7,23 +7,24 @@ export function DrawLine(
   svg,
   config,
   data: IEWChartProps['data'],
-  xAixs: { func: d3.ScaleTime<number, number, never>; data: Date[] },
-  yAixs: { func: d3.ScaleTime<number, number, never> }
+  xAixs: { func: any; data: Date[] },
+  yAixs: { func: any }
 ) {
   const svgEle = d3.select(svg);
 
   const draw = () => {
     const breakLines: Igroup[] = [];
     const lines: Igroup[] = [];
-    data.groups.forEach(group => {
-      if (group.break === 'line') {
-        lines.push(group);
-      } else if (group.break === 'none') {
-        breakLines.push(group);
-      }
-    });
+    data.groups &&
+      data.groups.forEach(group => {
+        if (group.break === 'line') {
+          lines.push(group);
+        } else if (group.break === 'none') {
+          breakLines.push(group);
+        }
+      });
 
-    let breakLineEle = svgEle.select('g.breakline_ele');
+    let breakLineEle: any = svgEle.select('g.breakline_ele');
     if (breakLines.length > 0) {
       if (breakLineEle.empty()) {
         breakLineEle = svgEle.append('g').attr('class', 'breakline_ele');
@@ -32,7 +33,7 @@ export function DrawLine(
         .line()
         .defined((d: any) => d != null && !isNaN(d))
         .x((d, i) => xAixs.func(xAixs.data[i]))
-        .y(d => yAixs.func(d != null && !isNaN(d) ? d : 0));
+        .y((d: any) => yAixs.func(d != null && !isNaN(d) ? d : 0));
 
       breakLineEle.attr('clip-path', 'url(#clip)');
       breakLineEle
@@ -53,7 +54,7 @@ export function DrawLine(
       }
     }
 
-    let lineEle = svgEle.select('g.line_ele');
+    let lineEle: any = svgEle.select('g.line_ele');
     if (lines.length > 0) {
       if (lineEle.empty()) {
         lineEle = svgEle.append('g').attr('class', 'line_ele');
@@ -61,15 +62,15 @@ export function DrawLine(
       lineEle.attr('clip-path', 'url(#clip)');
       lineEle.selectAll('path').remove();
       lines.forEach(data => {
-        const I = d3.map(data.values, (_, i) => i);
-        const D = d3.map(data.values, (d, i) => d != null && !isNaN(d));
+        const I = d3.map(data.values as any, (_, i) => i);
+        const D = d3.map(data.values as any, (d: any, i) => d != null && !isNaN(d));
 
         const line = d3
           .line()
           .defined((i: any) => D[i])
           .curve(d3.curveLinear)
-          .x(i => xAixs.func(xAixs.data[i]))
-          .y(i => yAixs.func(data.values[i]));
+          .x((i: any) => xAixs.func(xAixs.data[i]))
+          .y((i: any) => yAixs.func(data.values ? data.values[i] : 0));
 
         lineEle
           .append('path')
@@ -79,7 +80,7 @@ export function DrawLine(
           .attr('stroke-linejoin', 'round')
           .attr('stroke-linecap', 'round')
           .attr('stroke', data.color)
-          .attr('d', d => line(I)); // 根据索引，将连续的非null值绘制成分片的线段
+          .attr('d', d => line(I as any)); // 根据索引，将连续的非null值绘制成分片的线段
 
         lineEle
           .append('path')
@@ -89,7 +90,7 @@ export function DrawLine(
           .attr('stroke-linejoin', 'round')
           .attr('stroke-linecap', 'round')
           .attr('stroke', data.color)
-          .attr('d', line(I.filter(i => D[i]))); // 根据非null值的索引，找到非null值的x和y坐标，绘制curveLinear
+          .attr('d', line(I.filter(i => D[i]) as any)); // 根据非null值的索引，找到非null值的x和y坐标，绘制curveLinear
       });
     } else {
       if (!lineEle.empty()) {
@@ -109,23 +110,24 @@ export function DrawAreaLine(
   svg,
   config,
   data: IEWChartProps['data'],
-  xAixs: { func: d3.ScaleTime<number, number, never>; data: Date[] },
-  yAixs: { func: d3.ScaleTime<number, number, never> }
+  xAixs: { func: any; data: Date[] },
+  yAixs: { func: any }
 ) {
   const svgEle = d3.select(svg);
 
   const draw = () => {
     const breakLines: Igroup[] = [];
     const lines: Igroup[] = [];
-    data.groups.forEach(group => {
-      if (group.break === 'line') {
-        lines.push(group);
-      } else if (group.break === 'none') {
-        breakLines.push(group);
-      }
-    });
+    data.groups &&
+      data.groups.forEach(group => {
+        if (group.break === 'line') {
+          lines.push(group);
+        } else if (group.break === 'none') {
+          breakLines.push(group);
+        }
+      });
 
-    let breakLineEle = svgEle.select('g.breakline_ele');
+    let breakLineEle: any = svgEle.select('g.breakline_ele');
     if (breakLines.length > 0) {
       if (breakLineEle.empty()) {
         breakLineEle = svgEle.append('g').attr('class', 'breakline_ele');
@@ -136,7 +138,7 @@ export function DrawAreaLine(
         .line()
         .defined((d: any) => d != null && !isNaN(d))
         .x((d, i) => xAixs.func(xAixs.data[i]))
-        .y(d => yAixs.func(d != null && !isNaN(d) ? d : 0));
+        .y((d: any) => yAixs.func(d != null && !isNaN(d) ? d : 0));
 
       breakLineEle
         .selectAll('path.line')
@@ -156,8 +158,8 @@ export function DrawAreaLine(
         .defined((d: any) => d != null && !isNaN(d))
         .curve(d3.curveLinear)
         .x((d, i) => xAixs.func(xAixs.data[i]))
-        .y0(yAixs.func(data.y.start))
-        .y1(d => yAixs.func(d != null && !isNaN(d) ? d : 0));
+        .y0(yAixs.func(data.y ? data.y.start : 0))
+        .y1((d: any) => yAixs.func(d != null && !isNaN(d) ? d : 0));
 
       breakLineEle
         .selectAll('path.area')
@@ -172,7 +174,7 @@ export function DrawAreaLine(
       }
     }
 
-    let lineEle = svgEle.select('g.line_ele');
+    let lineEle: any = svgEle.select('g.line_ele');
     if (lines.length > 0) {
       if (lineEle.empty()) {
         lineEle = svgEle.append('g').attr('class', 'line_ele');
@@ -180,15 +182,15 @@ export function DrawAreaLine(
       lineEle.attr('clip-path', 'url(#clip)');
       lineEle.selectAll('path').remove();
       lines.forEach(lineData => {
-        const I = d3.map(lineData.values, (_, i) => i);
-        const D = d3.map(lineData.values, (d, i) => d != null && !isNaN(d));
+        const I = d3.map(lineData.values as any, (_, i) => i);
+        const D = d3.map(lineData.values as any, (d: any, i) => d != null && !isNaN(d));
 
         const line = d3
           .line()
           .defined((i: any) => D[i])
           .curve(d3.curveLinear)
-          .x(i => xAixs.func(xAixs.data[i]))
-          .y(i => yAixs.func(lineData.values[i]));
+          .x((i: any) => xAixs.func(xAixs.data[i]))
+          .y((i: any) => yAixs.func(lineData.values ? lineData.values[i] : 0));
 
         lineEle
           .append('path')
@@ -198,7 +200,7 @@ export function DrawAreaLine(
           .attr('stroke-linejoin', 'round')
           .attr('stroke-linecap', 'round')
           .attr('stroke', lineData.color)
-          .attr('d', d => line(I)); // 根据索引，将连续的非null值绘制成分片的线段
+          .attr('d', d => line(I as any)); // 根据索引，将连续的非null值绘制成分片的线段
 
         lineEle
           .append('path')
@@ -208,27 +210,27 @@ export function DrawAreaLine(
           .attr('stroke-linejoin', 'round')
           .attr('stroke-linecap', 'round')
           .attr('stroke', lineData.color)
-          .attr('d', line(I.filter(i => D[i]))); // 根据非null值的索引，找到非null值的x和y坐标，绘制curveLinear
+          .attr('d', line(I.filter(i => D[i]) as any)); // 根据非null值的索引，找到非null值的x和y坐标，绘制curveLinear
 
         const area = d3
           .area()
           .defined((i: any) => D[i])
           .curve(d3.curveLinear)
-          .x(i => xAixs.func(xAixs.data[i]))
-          .y0(yAixs.func(data.y.start))
-          .y1(i => yAixs.func(lineData.values[i]));
+          .x((i: any) => xAixs.func(xAixs.data[i]))
+          .y0(yAixs.func(data.y ? data.y.start : 0))
+          .y1((i: any) => yAixs.func(lineData.values ? lineData.values[i] : 0));
 
         lineEle
           .append('path')
           .attr('stroke', 'none')
           .attr('fill', opacityColor(lineData.color, 0.5))
-          .attr('d', area(I));
+          .attr('d', area(I as any));
 
         lineEle
           .append('path')
           .attr('stroke', 'none')
           .attr('fill', opacityColor(lineData.color, 0.5))
-          .attr('d', area(I.filter(i => D[i]))); // 根据非null值的索引，找到非null值的x和y坐标，绘制curveLinear
+          .attr('d', area(I.filter(i => D[i]) as any)); // 根据非null值的索引，找到非null值的x和y坐标，绘制curveLinear
       });
     } else {
       if (!lineEle.empty()) {

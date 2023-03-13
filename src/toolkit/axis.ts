@@ -4,11 +4,11 @@ import { getXData, showValue } from './formate';
 
 export function DrawXAixs(this: any, svg, config, data: IEWChartProps['data']) {
   const { left, right, width, height, bottom } = config;
-  const { start, end, interval } = data.x;
+  const { start, end, interval } = data.x as any;
   const xData = getXData(start, end, interval);
   const svgEle = d3.select(svg);
 
-  let xEle = svgEle.select('g.x_axis');
+  let xEle: any = svgEle.select('g.x_axis');
   if (xEle.empty()) {
     xEle = svgEle.append('g').attr('class', 'x_axis');
   }
@@ -36,9 +36,9 @@ export function DrawXAixs(this: any, svg, config, data: IEWChartProps['data']) {
 
 export function DrawYAixs(this: any, svg, config, data: IEWChartProps['data']) {
   const { left, right, width, height, bottom, top } = config;
-  const { start, end } = data.y;
+  const { start, end } = data.y as any;
   const svgEle = d3.select(svg);
-  let yEle = svgEle.select('g.y_axis');
+  let yEle: any = svgEle.select('g.y_axis');
   if (yEle.empty()) {
     yEle = svgEle.append('g').attr('class', 'y_axis');
   }
@@ -72,14 +72,14 @@ export function DrawXBandAixs(this: any, svg, config, data: IEWChartProps['data'
   const { left, right, width, height, bottom } = config;
   const svgEle = d3.select(svg);
 
-  let xEle = svgEle.select('g.x_axis');
+  let xEle: any = svgEle.select('g.x_axis');
   if (xEle.empty()) {
     xEle = svgEle.append('g').attr('class', 'x_axis');
   }
 
   const func = d3
     .scaleBand()
-    .domain(data.groups.map(group => group.label))
+    .domain((data.groups as any).map(group => group.label))
     .range([left, width - right])
     .paddingInner(0.1)
     .paddingOuter(0.1);

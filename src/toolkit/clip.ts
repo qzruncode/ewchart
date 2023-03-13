@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 export const drawClipPath = (svg, config) => {
   const { left, right, width, height, bottom, top } = config;
   const svgEle = d3.select(svg);
-  let clipEle = svgEle.select('rect.clip_path_rect');
+  let clipEle: any = svgEle.select('rect.clip_path_rect');
   if (clipEle.empty()) {
     clipEle = svgEle
       .append('defs')

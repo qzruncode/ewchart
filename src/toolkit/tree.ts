@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { v4 } from 'uuid';
-import { IEWChartProps, EWChartTreeData } from '../../types';
+import { IEWChartProps } from '../../types';
 
 const linkBg = '#000';
 const iconSize = 8;
@@ -22,7 +22,7 @@ export function drawTree(this: any, svg, config, data: IEWChartProps['data'], su
   spanNum = data.spanDepth != undefined ? data.spanDepth : 3;
   userDeepNum = data.depDepth != undefined ? data.depDepth : 1;
   addUniqueKey(treeData);
-  const tree = d3.hierarchy(treeData);
+  const tree: any = d3.hierarchy(treeData);
   const treeLayout = d3.tree().nodeSize([120, 150])(tree);
   drawLinks(treeEle, treeLayout, config);
   const res = drawNodes(treeEle, treeLayout, subscription, config);
@@ -77,13 +77,15 @@ function drawNodes(treeEle, treeLayout, subscription, config) {
     .data(nodes)
     .join('g')
     .attr('class', 'node')
-    .attr('transform', d => 'translate(' + d.x + ',' + d.y + ')')
+    .attr('transform', d => 'translate(' + d.x + ',' + d.y + ')');
+  const nodeContent = nodeEles.append('g').attr('class', 'node_content');
+  const nodeBox = nodeContent
+    .append('g')
+    .attr('class', 'node_box')
     .on('click', function (this: any) {
-      const d = d3.select(this).data()[0].data;
+      const d = (d3.select(this).data() as Array<any>)[0].data;
       config.onClick && config.onClick(d);
     });
-  const nodeContent = nodeEles.append('g').attr('class', 'node_content');
-  const nodeBox = nodeContent.append('g').attr('class', 'node_box');
   const nodeExtra = nodeContent.append('g').attr('class', 'node_extra');
   nodeBox
     .append('rect')
@@ -100,7 +102,7 @@ function drawNodes(treeEle, treeLayout, subscription, config) {
     .html(d =>
       d.data.error
         ? `<animate attributeName="fill" dur="2s" calcMode="linear" repeatCount="indefinite"
-    values="pink ; ${d3.color('red').darker(0.5)} ; pink" 
+    values="pink ; ${(d3.color('red') as any).darker(0.5)} ; pink" 
     keyTimes="0 ; 0.5 ; 1" />`
         : ''
     );
@@ -230,13 +232,6 @@ function drawNodeName(nodeBox) {
     .text(d => d.data.name)
     .attr('stroke', 'none')
     .attr('fill', 'black')
-    .on('click', e => {
-      // const eleData = d3.select(e.target).data();
-      // if (eleData && eleData[0]) {
-      //   const data = eleData[0].data;
-      //   this.extraCallback.click(`${data.reqId}$$${data.rpcId}`);
-      // }
-    })
     .call(texts => {
       texts.each(function (this: any) {
         const text = d3.select(this);
@@ -402,29 +397,6 @@ function reExpand(treeEle, subscription, config) {
     });
     subscription.publish();
   }
-}
-
-function deepClone(data: EWChartTreeData | undefined) {
-  let newData;
-  if (data) {
-    newData = Object.assign({}, data);
-    const keys = Object.keys(newData);
-    for (const key of keys) {
-      const value = newData[key];
-      if (key === 'children' && value != undefined) {
-        newData[key] = value.map(d => deepClone(d));
-      } else {
-        if (Array.isArray(value)) {
-          newData[key] = [...value];
-        } else {
-          newData[key] = value;
-        }
-      }
-    }
-    return newData;
-  }
-
-  return null;
 }
 
 function addUniqueKey(rootNode) {

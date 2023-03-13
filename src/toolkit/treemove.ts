@@ -12,7 +12,7 @@ export default function TreeMove(this: any, svg, nodeEles, data) {
   }
 
   function entered(event) {
-    // config.onMove && config.onMove('enter');
+    return null;
   }
 
   function moved(this: any, event, data) {
@@ -20,16 +20,9 @@ export default function TreeMove(this: any, svg, nodeEles, data) {
   }
 
   function leaved(this: any, event) {
-    console.log(data);
     if (data.fixed !== true) {
       d3.select(svg).select('g.node_tooltip').remove();
     }
-    // const pie = d3.select(this);
-    // pie.style('transform', 'none');
-    // if (config.mouse.shadow) {
-    //   pie.attr('filter', 'none');
-    // }
-    // config.onMove && config.onMove('leave');
   }
 
   const clear = () => {
