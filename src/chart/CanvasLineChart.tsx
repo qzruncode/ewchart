@@ -3,7 +3,7 @@ import { ConfigContext, mouseMoves } from '..';
 import { DrawXAixs, DrawYAixs } from '../toolkit/canvas_axis';
 import { DrawBrush } from '../toolkit/brush';
 import { drawClipPath } from '../toolkit/clip';
-import { DrawAreaLine, DrawLine } from '../toolkit/line';
+import { DrawAreaLine, DrawLine } from '../toolkit/canvas_line';
 import LineMove from '../toolkit/linemove';
 import { DrawPoint } from '../toolkit/point';
 
@@ -52,14 +52,14 @@ function LineChart({ data, id, subscription, type }) {
     if (chartConfig.width != undefined && canvasRef.current != null) {
       const yAixs = new DrawYAixs(canvasRef.current, chartConfig, data);
       const xAixs = new DrawXAixs(canvasRef.current, chartConfig, data);
-      //   let line;
-      //   if (type === 'arealine') {
-      //     line = new DrawAreaLine(svgRef.current, chartConfig, data, xAixs, yAixs);
-      //   } else if (type === 'line') {
-      //     line = new DrawLine(svgRef.current, chartConfig, data, xAixs, yAixs);
-      //   } else if (type === 'scatter') {
-      //     line = new DrawPoint(svgRef.current, chartConfig, data, xAixs, yAixs);
-      //   }
+      let line;
+      if (type === 'arealine') {
+        // line = new DrawAreaLine(svgRef.current, chartConfig, data, xAixs, yAixs);
+      } else if (type === 'line') {
+        line = new DrawLine(canvasRef.current, chartConfig, data, xAixs, yAixs);
+      } else if (type === 'scatter') {
+        // line = new DrawPoint(svgRef.current, chartConfig, data, xAixs, yAixs);
+      }
       //   drawClipPath(svgRef.current, chartConfig);
       //   if (chartConfig.mouse) {
       //     lineMove = new LineMove(svgRef.current, chartConfig, data, xAixs, yAixs);
