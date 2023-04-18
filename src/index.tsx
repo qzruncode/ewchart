@@ -8,6 +8,7 @@ import { getColors } from './toolkit/color';
 import PieChart from './chart/PieChart';
 import Histogram from './chart/HistogramChart';
 import TreeChart from './chart/TreeChart';
+import CanvasLineChart from './chart/CanvasLineChart';
 
 const defaultConfig = {
   height: 400,
@@ -61,8 +62,14 @@ function EWChart(props: IEWChartProps) {
     switch (type) {
       case 'line':
       case 'arealine':
-      case 'scatter':
-        return <LineChart data={props.data} id={id} subscription={subscription} type={type} />;
+      case 'scatter': {
+        if (props.renderer === 'canvas') {
+          return <CanvasLineChart data={props.data} id={id} subscription={subscription} type={type} />;
+        } else {
+          return <LineChart data={props.data} id={id} subscription={subscription} type={type} />;
+        }
+      }
+
       case 'pie':
         return <PieChart data={props.data} id={id} subscription={subscription} />;
       case 'histogram':
@@ -73,6 +80,8 @@ function EWChart(props: IEWChartProps) {
         return null;
     }
   };
+
+  console.log(props);
   return (
     <div className={id + (props.className ? ` ${props.className}` : '')} style={props.style ? props.style : undefined}>
       {props.data.groups && props.data.groups.length === 0 && props.data.treeData == undefined ? (

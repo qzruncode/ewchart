@@ -44,6 +44,7 @@ export interface EWChartTreeData {
 
 export interface IEWChartProps {
   type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'tree';
+  renderer: 'canvas' | 'svg';
   style?: { [name: string]: any };
   className?: string;
   size?: {
