@@ -2,55 +2,76 @@ import * as d3 from 'd3';
 import { IEWChartProps } from '../../types';
 import { getXData, showValue } from './formate';
 
+const scale = window.devicePixelRatio || 1;
+
 export function DrawXAixs(this: any, canvas, config, data: IEWChartProps['data']) {
-  const { left, right, width, height, bottom, top } = config;
+  let { left, right, width, height, bottom, top } = config;
+  left = scale * left;
+  right = scale * right;
+  width = scale * width;
+  height = scale * height;
+  bottom = scale * bottom;
+  top = scale * top;
   const { start, end, interval } = data.x as any;
   const xData = getXData(start, end, interval);
   const context = canvas.getContext('2d');
   const minX = left,
     maxX = width - right,
-    tickSize = 6;
+    tickSize = 6 * scale;
   const func = d3
     .scaleUtc()
     .domain([new Date(start), new Date(end)])
     .range([minX, maxX]);
-  const ticksLen = xData.length < 10 ? 5 : 10;
+  const ticksLen = (xData.length < 10 ? 5 : 10) * scale;
   const allTicks = func.ticks(ticksLen);
   const format = func.tickFormat(ticksLen, '%H:%M:%S');
 
-  context.strokeStyle = 'black';
-  context.beginPath();
-  allTicks.forEach(d => {
-    context.moveTo(func(d), height - bottom);
-    context.lineTo(func(d), height - bottom + tickSize);
-  });
-  context.stroke();
-
-  context.beginPath();
-  context.moveTo(minX, height - bottom);
-  context.lineTo(maxX, height - bottom);
-  context.stroke();
-
-  context.textAlign = 'center';
-  context.textBaseline = 'top';
-  context.fillStyle = 'black';
-  allTicks.forEach(d => {
+  const draw = () => {
+    context.save();
+    context.strokeStyle = 'black';
+    context.lineWidth = 1 * scale;
     context.beginPath();
-    context.fillText(format(d), func(d), height - bottom + tickSize);
-  });
+    allTicks.forEach(d => {
+      context.moveTo(func(d), height - bottom);
+      context.lineTo(func(d), height - bottom + tickSize);
+    });
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(minX, height - bottom);
+    context.lineTo(maxX, height - bottom);
+    context.stroke();
+
+    context.textAlign = 'center';
+    context.textBaseline = 'top';
+    context.fillStyle = 'black';
+    context.font = `${10 * scale}px auto`;
+    allTicks.forEach(d => {
+      context.beginPath();
+      context.fillText(format(d), func(d), height - bottom + tickSize);
+    });
+    context.restore();
+  };
 
   this.func = func;
   this.data = xData;
+  this.draw = draw;
 }
 
 export function DrawYAixs(this: any, canvas, config, data: IEWChartProps['data']) {
-  const { left, right, width, height, bottom, top } = config;
+  let { left, right, width, height, bottom, top } = config;
+  left = scale * left;
+  right = scale * right;
+  width = scale * width;
+  height = scale * height;
+  bottom = scale * bottom;
+  top = scale * top;
   const { start, end } = data.y as any;
   const context = canvas.getContext('2d');
   const minX = left,
     maxX = width - right,
-    tickSize = 6,
-    tickPadding = 3;
+    tickSize = 6 * scale,
+    tickPadding = 3 * scale;
   const func = d3
     .scaleLinear()
     .domain([start, end])
@@ -58,24 +79,29 @@ export function DrawYAixs(this: any, canvas, config, data: IEWChartProps['data']
   const allTicks = func.ticks();
   const format = v => showValue(data.yUnit, v);
 
-  context.strokeStyle = '#c3c3c3';
-  context.lineWidth = 0.5;
-  context.beginPath();
-  allTicks.forEach(d => {
-    context.moveTo(minX, func(d));
-    context.lineTo(maxX, func(d));
-  });
-  context.stroke();
-
-  context.textAlign = 'right';
-  context.textBaseline = 'middle';
-  context.fillStyle = 'black';
-  allTicks.forEach(d => {
+  const draw = () => {
+    context.save();
+    context.strokeStyle = '#c3c3c3';
+    context.lineWidth = 0.5 * scale;
     context.beginPath();
-    context.fillText(format(d), minX - tickSize - tickPadding, func(d));
-  });
+    allTicks.forEach(d => {
+      context.moveTo(minX, func(d));
+      context.lineTo(maxX, func(d));
+    });
+    context.stroke();
 
+    context.textAlign = 'right';
+    context.textBaseline = 'middle';
+    context.fillStyle = 'black';
+    context.font = `${10 * scale}px auto`;
+    allTicks.forEach(d => {
+      context.beginPath();
+      context.fillText(format(d), minX - tickSize - tickPadding, func(d));
+    });
+    context.restore();
+  };
   this.func = func;
+  this.draw = draw;
 }
 
 export function DrawXBandAixs(this: any, svg, config, data: IEWChartProps['data']) {

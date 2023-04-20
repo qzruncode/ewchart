@@ -2,6 +2,8 @@ import * as d3 from 'd3';
 import { IEWChartProps, Igroup } from '../../types';
 import { opacityColor } from './color';
 
+const scale = window.devicePixelRatio || 1;
+
 export function DrawLine(
   this: any,
   canvas,
@@ -28,21 +30,14 @@ export function DrawLine(
     .x((d, i) => xAixs.func(xAixs.data[i]))
     .y((d: any) => yAixs.func(d != null && !isNaN(d) ? d : 0));
 
-  context.lineCap = 'round';
-  context.lineJoin = 'round';
-  context.lineWidth = 1;
-  breakLines.forEach(breakLine => {
-    if (breakLine.lineType === 'dotted') {
-      context.setLineDash([1, 3]);
-    } else {
-      context.setLineDash([]);
-    }
-    context.strokeStyle = breakLine.color;
+  const lineWidth = 1;
+  const lineDash = [1, 3];
+  const breakLineDash = [5, 5];
+  const breakLinePaths = breakLines.map(breakLine => {
     const path = new Path2D(line(breakLine.values));
-    context.stroke(path);
+    return path;
   });
-
-  lines.forEach(normalLine => {
+  const linePaths = lines.map(normalLine => {
     const I = d3.map(normalLine.values as any, (_, i) => i);
     const D = d3.map(normalLine.values as any, (d: any, i) => d != null && !isNaN(d));
     const line = d3
@@ -51,29 +46,49 @@ export function DrawLine(
       .curve(d3.curveLinear)
       .x((i: any) => xAixs.func(xAixs.data[i]))
       .y((i: any) => yAixs.func(normalLine.values ? normalLine.values[i] : 0));
-
-    if (normalLine.lineType === 'dotted') {
-      context.setLineDash([1, 3]);
-    } else {
-      context.setLineDash([]);
-    }
-    context.strokeStyle = normalLine.color;
     const path1 = new Path2D(line(I as any));
-    context.stroke(path1);
-
-    if (normalLine.lineType === 'dotted') {
-      context.setLineDash([5, 5]);
-    } else {
-      context.setLineDash([]);
-    }
     const path2 = new Path2D(line(I.filter(i => D[i]) as any));
-    context.stroke(path2);
+    return [path1, path2];
   });
 
-  // draw();
-  // this.reDraw = () => {
-  //   draw();
-  // };
+  const draw = () => {
+    context.save();
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
+    context.lineWidth = lineWidth;
+    breakLines.forEach((breakLine, index) => {
+      if (breakLine.lineType === 'dotted') {
+        context.setLineDash(lineDash);
+      } else {
+        context.setLineDash([]);
+      }
+      context.strokeStyle = breakLine.color;
+      const path = breakLinePaths[index];
+      context.stroke(path);
+    });
+
+    lines.forEach((normalLine, index) => {
+      if (normalLine.lineType === 'dotted') {
+        context.setLineDash(lineDash);
+      } else {
+        context.setLineDash([]);
+      }
+      context.strokeStyle = normalLine.color;
+
+      context.stroke(linePaths[index][0]);
+
+      if (normalLine.breakType === 'dotted') {
+        context.setLineDash(breakLineDash);
+      } else {
+        context.setLineDash([]);
+      }
+
+      context.stroke(linePaths[index][1]);
+    });
+    context.restore();
+  };
+
+  this.draw = draw;
 }
 
 export function DrawAreaLine(

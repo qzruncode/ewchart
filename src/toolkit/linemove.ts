@@ -81,8 +81,6 @@ function DrawCircle(this: any, svg, config, moveCross, yAixs, data: IEWChartProp
     .selectAll('.dot')
     .data(ys)
     .join('circle')
-    .attr('cx', moveCross.x)
-    .attr('cy', d => d.y)
     .attr('class', 'dot')
     .attr('cx', moveCross.x)
     .attr('cy', d => d.y)
