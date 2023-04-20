@@ -1,45 +1,6 @@
 import * as d3 from 'd3';
-import { mouseMoves } from '..';
 import { IEWChartProps } from '../../types';
 const scale = window.devicePixelRatio || 1;
-
-function DrawCircle(this: any, svg, config, moveCross, yAixs, data: IEWChartProps['data']) {
-  const svgEle = d3.select(svg);
-  const ys: Array<{ x: number; y: number; c: string | undefined; label: string; value: number | null }> = [];
-  data.groups &&
-    data.groups.forEach(group => {
-      if (group.values) {
-        const value = group.values[moveCross.xIndex];
-        const y = yAixs.func(value); // y坐标
-        if (y !== undefined) {
-          ys.push({
-            x: moveCross.x,
-            y,
-            c: group.color,
-            label: group.label,
-            value,
-          });
-        }
-      }
-    });
-
-  svgEle.selectAll('.dot').remove();
-  svgEle
-    .selectAll('.dot')
-    .data(ys)
-    .join('circle')
-    .attr('cx', moveCross.x)
-    .attr('cy', d => d.y)
-    .attr('class', 'dot')
-    .attr('cx', moveCross.x)
-    .attr('cy', d => d.y)
-    .attr('r', data.pointSize != undefined ? data.pointSize * 1.2 : 3.5)
-    .attr('fill', 'none')
-    .attr('stroke', d => (d.c ? d.c : 'none'));
-
-  this.circles = svgEle.selectAll('.dot');
-  this.points = ys;
-}
 
 export default function LineMove(
   this: any,
@@ -55,72 +16,55 @@ export default function LineMove(
   } else {
     d3.select(ocanvas).on('mouseenter', entered).on('mousemove', moved).on('mouseleave', leaved);
   }
+  let isOut = true;
 
-  function entered(event, passive) {
-    console.log(event, passive);
-    // config.group != undefined &&
-    //   !passive &&
-    //   mouseMoves
-    //     .filter(mouseMove => mouseMove !== that && mouseMove.group === config.group)
-    //     .forEach(mouseMove => {
-    //       mouseMove.entered(event, true);
-    //     });
-    // cross = new DrawCross(canvas, config);
-    // config.onMove && config.onMove('enter');
+  function entered() {
+    isOut = false;
+    config.onMove && config.onMove('enter');
   }
 
-  let drawCircle, position;
-  function moved(event, passive) {
+  let position,
+    xm,
+    xIndex,
+    x,
+    ys: Array<{ x: number; y: number; c: string | undefined; label: string; value: number | null }>;
+  function moved(event) {
     position = d3.pointer(event);
-    // drawCircle = new DrawCircle(svg, config, moveCross, yAixs, data);
-    // config.onMove && config.onMove('move', drawCircle.points, { x: position[0], y: position[1] });
+    xm = xAixs.func.invert(position[0] * scale); // 根据用户坐标获取svg坐标
+    xIndex = d3.bisectCenter(xAixs.data, xm); // 根据svg坐标获取最近点的索引
+    x = xAixs.func(xAixs.data[xIndex]); // 根据索引获取svg坐标值，进而获取用户坐标值
+    ys = [];
+    data.groups &&
+      data.groups.forEach(group => {
+        if (group.values) {
+          const value = group.values[xIndex];
+          const y = yAixs.func(value); // y坐标
+          if (y !== undefined) {
+            ys.push({
+              x,
+              y,
+              c: group.color,
+              label: group.label,
+              value,
+            });
+          }
+        }
+      });
+    config.onMove && config.onMove('move', ys, { x: position[0], y: position[1] });
   }
 
-  function leaved(event, passive) {
-    // config.group != undefined &&
-    //   !passive &&
-    //   mouseMoves
-    //     .filter(mouseMove => mouseMove !== that && mouseMove.group === config.group)
-    //     .forEach(mouseMove => {
-    //       mouseMove.leaved(event, true);
-    //     });
-    // cross.xcrossEle.remove();
-    // cross.ycrossEle.remove();
-    // drawCircle.circles.remove();
-    // config.onMove && config.onMove('leave');
+  function leaved() {
+    isOut = true;
+    config.onMove && config.onMove('leave');
   }
 
-  let { left, right, width, height, top, bottom } = config;
+  let { left, width, height } = config;
   left = scale * left;
-  right = scale * right;
   width = scale * width;
   height = scale * height;
-  bottom = scale * bottom;
-  top = scale * top;
 
   const draw = () => {
-    if (position != undefined) {
-      const xm = xAixs.func.invert(position[0] * scale); // 根据用户坐标获取svg坐标
-      const xIndex = d3.bisectCenter(xAixs.data, xm); // 根据svg坐标获取最近点的索引
-      const x = xAixs.func(xAixs.data[xIndex]); // 根据索引获取svg坐标值，进而获取用户坐标值
-      const ys: Array<{ x: number; y: number; c: string | undefined; label: string; value: number | null }> = [];
-      data.groups &&
-        data.groups.forEach(group => {
-          if (group.values) {
-            const value = group.values[xIndex];
-            const y = yAixs.func(value); // y坐标
-            if (y !== undefined) {
-              ys.push({
-                x,
-                y,
-                c: group.color,
-                label: group.label,
-                value,
-              });
-            }
-          }
-        });
-
+    if (position != undefined && !isOut) {
       const context = canvas.getContext('2d');
       context.save();
       // 十字线-y
@@ -148,7 +92,7 @@ export default function LineMove(
       });
       // 十字线-y-文本
       if (config.mouse.crossText) {
-        const text = yAixs.func.invert(position[1]).toFixed(2);
+        const text = yAixs.func.invert(position[1] * scale).toFixed(2);
         context.fillStyle = 'red';
         context.textAlign = 'left';
         context.font = `${10 * scale}px auto`;
@@ -161,16 +105,4 @@ export default function LineMove(
   };
 
   this.draw = draw;
-
-  // const clear = () => {
-  //   svgEle.on('.');
-  // };
-
-  // if (config.group != undefined) {
-  //   this.group = config.group;
-  // }
-  // this.entered = entered;
-  // this.moved = moved;
-  // this.leaved = leaved;
-  // this.clear = clear;
 }

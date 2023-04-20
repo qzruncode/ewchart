@@ -2,8 +2,6 @@ import * as d3 from 'd3';
 import { IEWChartProps, Igroup } from '../../types';
 import { opacityColor } from './color';
 
-const scale = window.devicePixelRatio || 1;
-
 export function DrawLine(
   this: any,
   canvas,

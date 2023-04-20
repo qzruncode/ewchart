@@ -5,13 +5,12 @@ import { getXData, showValue } from './formate';
 const scale = window.devicePixelRatio || 1;
 
 export function DrawXAixs(this: any, canvas, config, data: IEWChartProps['data']) {
-  let { left, right, width, height, bottom, top } = config;
+  let { left, right, width, height, bottom } = config;
   left = scale * left;
   right = scale * right;
   width = scale * width;
   height = scale * height;
   bottom = scale * bottom;
-  top = scale * top;
   const { start, end, interval } = data.x as any;
   const xData = getXData(start, end, interval);
   const context = canvas.getContext('2d');
