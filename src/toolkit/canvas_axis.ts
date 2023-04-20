@@ -21,7 +21,7 @@ export function DrawXAixs(this: any, canvas, config, data: IEWChartProps['data']
     .scaleUtc()
     .domain([new Date(start), new Date(end)])
     .range([minX, maxX]);
-  const ticksLen = (xData.length < 10 ? 5 : 10) * scale;
+  const ticksLen = xData.length < 10 ? 5 : 10;
   const allTicks = func.ticks(ticksLen);
   const format = func.tickFormat(ticksLen, '%H:%M:%S');
 

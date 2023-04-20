@@ -56,13 +56,11 @@ function LineChart({ data, id, subscription, type }) {
     if (chartConfig.width != undefined && canvasRef.current != null) {
       let line;
       const canvas = new OffscreenCanvas(canvasRef.current.width, canvasRef.current.height);
-      // const canvas = canvasRef.current.transferControlToOffscreen();
-      // setOffscreenCanvasSize(canvas);
       const yAixs = new DrawYAixs(canvas, chartConfig, data);
       const xAixs = new DrawXAixs(canvas, chartConfig, data);
 
       if (type === 'arealine') {
-        // line = new DrawAreaLine(svgRef.current, chartConfig, data, xAixs, yAixs);
+        line = new DrawAreaLine(canvas, chartConfig, data, xAixs, yAixs);
       } else if (type === 'line') {
         line = new DrawLine(canvas, chartConfig, data, xAixs, yAixs);
       } else if (type === 'scatter') {
@@ -76,14 +74,14 @@ function LineChart({ data, id, subscription, type }) {
 
       let myReq;
       const reDraw = () => {
-        if (canvas) {
+        if (canvas && canvasRef.current != null) {
           const context = canvasRef.current.getContext('bitmaprenderer');
           // context.clearRect(0, 0, canvas.width, canvas.height);
 
-          yAixs.draw();
-          xAixs.draw();
-          line.draw();
-          lineMove.draw();
+          yAixs && yAixs.draw && yAixs.draw();
+          xAixs && xAixs.draw && xAixs.draw();
+          line && line.draw && line.draw();
+          lineMove && lineMove.draw && lineMove.draw();
 
           const bitmapOne = canvas.transferToImageBitmap();
           context.transferFromImageBitmap(bitmapOne);

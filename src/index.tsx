@@ -81,7 +81,6 @@ function EWChart(props: IEWChartProps) {
     }
   };
 
-  console.log(props);
   return (
     <div className={id + (props.className ? ` ${props.className}` : '')} style={props.style ? props.style : undefined}>
       {props.data.groups && props.data.groups.length === 0 && props.data.treeData == undefined ? (

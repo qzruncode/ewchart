@@ -3,6 +3,7 @@ import React from 'react';
 export interface Igroup {
   color?: string;
   lineType?: 'dotted' | 'solid';
+  lineWidth?: number;
   label: string;
   break?: 'line' | 'none';
   breakType?: 'dotted' | 'solid';
