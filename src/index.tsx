@@ -37,6 +37,7 @@ function EWChart(props: IEWChartProps) {
     });
     window.addEventListener('resize', fn);
     return () => {
+      mouseMoves.splice(0, mouseMoves.length);
       window.removeEventListener('resize', fn);
     };
   }, []);

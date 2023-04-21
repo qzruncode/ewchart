@@ -15,18 +15,12 @@ const setCanvasSize = (canvas, width, height) => {
   canvas.height = height * scale;
 };
 
-const setOffscreenCanvasSize = canvas => {
-  const scale = window.devicePixelRatio || 1;
-  canvas.getContext('2d').scale(scale, scale);
-};
-
 function LineChart({ data, id, subscription, type }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const config = useContext(ConfigContext);
   const [chartConfig, setChartConfig] = useState(config);
 
   useEffect(() => {
-    console.log(1111);
     const box = document.querySelector(`.${id}`);
     setTimeout(() => {
       const w = box ? Number(getComputedStyle(box).width.slice(0, -2)) : undefined;
@@ -66,17 +60,15 @@ function LineChart({ data, id, subscription, type }) {
       } else if (type === 'scatter') {
         // line = new DrawPoint(svgRef.current, chartConfig, data, xAixs, yAixs);
       }
-      //   drawClipPath(svgRef.current, chartConfig);
       if (chartConfig.mouse) {
         lineMove = new LineMove(canvasRef.current, canvas, chartConfig, data, xAixs, yAixs);
-        //     mouseMoves.push(lineMove);
+        mouseMoves.push(lineMove);
       }
 
       let myReq;
       const reDraw = () => {
         if (canvas && canvasRef.current != null) {
           const context = canvasRef.current.getContext('bitmaprenderer');
-          // context.clearRect(0, 0, canvas.width, canvas.height);
 
           yAixs && yAixs.draw && yAixs.draw();
           xAixs && xAixs.draw && xAixs.draw();
@@ -96,7 +88,7 @@ function LineChart({ data, id, subscription, type }) {
       // }
       return () => {
         window.cancelAnimationFrame(myReq);
-        // lineMove && lineMove.clear && lineMove.clear();
+        lineMove && lineMove.clear && lineMove.clear();
         // brush && brush.clear && brush.clear();
       };
     }

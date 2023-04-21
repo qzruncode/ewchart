@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { IEWChartProps } from '../../types';
+import { mouseMoves } from '..';
 const scale = window.devicePixelRatio || 1;
 
 export default function LineMove(
@@ -11,6 +12,7 @@ export default function LineMove(
   xAixs: { func: d3.ScaleTime<number, number, never>; data: Date[] },
   yAixs: { func: d3.ScaleLinear<number, number, never> }
 ) {
+  const that = this;
   if ('ontouchstart' in document) {
     d3.select(ocanvas).on('touchstart', entered).on('touchmove', moved).on('touchend', leaved);
   } else {
@@ -18,7 +20,14 @@ export default function LineMove(
   }
   let isOut = true;
 
-  function entered() {
+  function entered(event, passive) {
+    config.group != undefined &&
+      !passive &&
+      mouseMoves
+        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.group)
+        .forEach(mouseMove => {
+          mouseMove.entered(event, true);
+        });
     isOut = false;
     config.onMove && config.onMove('enter');
   }
@@ -28,7 +37,15 @@ export default function LineMove(
     xIndex,
     x,
     ys: Array<{ x: number; y: number; c: string | undefined; label: string; value: number | null }>;
-  function moved(event) {
+  function moved(event, passive) {
+    config.group != undefined &&
+      !passive &&
+      mouseMoves
+        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.group)
+        .forEach(mouseMove => {
+          mouseMove.moved(event, true);
+        });
+    isOut = false;
     position = d3.pointer(event);
     xm = xAixs.func.invert(position[0] * scale); // 根据用户坐标获取svg坐标
     xIndex = d3.bisectCenter(xAixs.data, xm); // 根据svg坐标获取最近点的索引
@@ -53,7 +70,14 @@ export default function LineMove(
     config.onMove && config.onMove('move', ys, { x: position[0], y: position[1] });
   }
 
-  function leaved() {
+  function leaved(event, passive) {
+    config.group != undefined &&
+      !passive &&
+      mouseMoves
+        .filter(mouseMove => mouseMove !== that && mouseMove.group === config.group)
+        .forEach(mouseMove => {
+          mouseMove.leaved(event, true);
+        });
     isOut = true;
     config.onMove && config.onMove('leave');
   }
@@ -104,5 +128,17 @@ export default function LineMove(
     }
   };
 
+  if (config.group != undefined) {
+    this.group = config.group;
+  }
+
+  const clear = () => {
+    d3.select(ocanvas).on('.');
+  };
+
   this.draw = draw;
+  this.entered = entered;
+  this.moved = moved;
+  this.leaved = leaved;
+  this.clear = clear;
 }
