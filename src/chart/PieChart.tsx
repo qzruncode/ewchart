@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ConfigContext } from '..';
-import { DrawPie } from '../toolkit/pie';
-import PieMove from '../toolkit/piemove';
+import { DrawPie } from '../toolkit/level1/pie';
+import PieMove from '../toolkit/level1/piemove';
 import { drawPieShadow } from '../toolkit/shadow';
 
 function PieChart({ data, id, subscription }) {

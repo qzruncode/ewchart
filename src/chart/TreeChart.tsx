@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ConfigContext } from '..';
 import { drawTreeNodeShadow } from '../toolkit/shadow';
-import { drawTree } from '../toolkit/tree';
-import TreeMove from '../toolkit/treemove';
+import { drawTree } from '../toolkit/level1/tree';
+import TreeMove from '../toolkit/level1/treemove';
 import { zoom } from '../toolkit/zoom';
 
 let globalDrawTree;

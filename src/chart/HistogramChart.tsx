@@ -3,8 +3,8 @@ import { useRef, useContext, useState, useEffect } from 'react';
 import { ConfigContext } from '..';
 import { DrawXBandAixs, DrawYAixs } from '../toolkit/level1/axis';
 import { drawClipPath } from '../toolkit/level1/clip';
-import { DrawHistogram } from '../toolkit/histogram';
-import HistogramMove from '../toolkit/histogrammove';
+import { DrawHistogram } from '../toolkit/level1/histogram';
+import HistogramMove from '../toolkit/level1/histogrammove';
 
 function HistogramChart({ data, id, subscription }) {
   const svgRef = useRef(null);

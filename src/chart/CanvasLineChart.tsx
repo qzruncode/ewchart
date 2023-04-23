@@ -1,10 +1,8 @@
-import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ConfigContext, mouseMoves } from '..';
 import { DrawXAixs, DrawYAixs } from '../toolkit/level2/axis';
-import { drawClipPath } from '../toolkit/level1/clip';
 import { DrawAreaLine, DrawLine } from '../toolkit/level2/line';
 import LineMove from '../toolkit/level2/linemove';
-import { DrawPoint } from '../toolkit/point';
 
 const setCanvasSize = (canvas, width, height) => {
   const scale = window.devicePixelRatio || 1;
@@ -48,7 +46,6 @@ function LineChart({ data, id, subscription, type }) {
 
   useEffect(() => {
     let lineMove;
-    let brush;
     if (chartConfig.width != undefined && canvasRef.current != null) {
       let line;
       const canvas = new OffscreenCanvas(canvasRef.current.width, canvasRef.current.height);
@@ -59,8 +56,6 @@ function LineChart({ data, id, subscription, type }) {
         line = new DrawAreaLine(canvas, chartConfig, data, xAixs, yAixs);
       } else if (type === 'line') {
         line = new DrawLine(canvas, chartConfig, data, xAixs, yAixs);
-      } else if (type === 'scatter') {
-        // line = new DrawPoint(svgRef.current, chartConfig, data, xAixs, yAixs);
       }
       if (chartConfig.mouse) {
         lineMove = new LineMove(canvasRef.current, canvas, chartConfig, data, xAixs, yAixs);
@@ -82,16 +77,10 @@ function LineChart({ data, id, subscription, type }) {
           myReq = window.requestAnimationFrame(reDraw);
         }
       };
-
       myReq = window.requestAnimationFrame(reDraw);
-      // if (chartConfig.select) {
-      //   brush = new DrawBrush(canvasRef.current, canvas, chartConfig, data, line, xAixs, yAixs);
-      // }
-      // }
       return () => {
         window.cancelAnimationFrame(myReq);
         lineMove && lineMove.clear && lineMove.clear();
-        // brush && brush.clear && brush.clear();
       };
     }
   }, [chartConfig, canvasRef.current, data]);

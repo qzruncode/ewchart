@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { IEWChartProps } from '../../types';
+import { IEWChartProps } from '../../../types';
 
 export function DrawPie(this: any, svg, config, data: IEWChartProps['data']) {
   const svgEle = d3.select(svg);
@@ -60,7 +60,6 @@ export function DrawPie(this: any, svg, config, data: IEWChartProps['data']) {
           .attr('font-weight', 'bold')
           .text(d => (d.data.choose === true ? d.data.label : ''))
       )
-
       .call(text =>
         text
           .append('tspan')

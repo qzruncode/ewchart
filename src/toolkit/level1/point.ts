@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { IEWChartProps } from '../../types';
+import { IEWChartProps } from '../../../types';
 
 export function DrawPoint(
   this: any,

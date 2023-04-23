@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { IEWChartProps } from '../../types';
+import { IEWChartProps } from '../../../types';
 
 function omitXtext(svg, xAixs: { func: d3.ScaleBand<string> }) {
   const svgEle = d3.select(svg);

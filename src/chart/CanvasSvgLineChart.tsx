@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ConfigContext, mouseMoves } from '..';
 import { DrawXAixs, DrawYAixs } from '../toolkit/level2/axis';
 import { DrawBrush } from '../toolkit/level3/brush';
 import { DrawAreaLine, DrawLine } from '../toolkit/level2/line';
 import LineMove from '../toolkit/level3/linemove';
-import { DrawPoint } from '../toolkit/point';
 import * as d3 from 'd3';
 
 const setCanvasSize = (canvas, width, height) => {
@@ -68,8 +67,6 @@ function LineChart({ data, id, subscription, type }) {
         line = new DrawAreaLine(canvas, chartConfig, data, xAixs, yAixs);
       } else if (type === 'line') {
         line = new DrawLine(canvas, chartConfig, data, xAixs, yAixs);
-      } else if (type === 'scatter') {
-        // line = new DrawPoint(svgRef.current, chartConfig, data, xAixs, yAixs);
       }
       if (chartConfig.mouse) {
         lineMove = new LineMove(svgRef.current, canvasRef.current, canvas, chartConfig, data, xAixs, yAixs);
@@ -96,7 +93,6 @@ function LineChart({ data, id, subscription, type }) {
       if (chartConfig.select) {
         brush = new DrawBrush(svgRef.current, chartConfig, data, line, xAixs, yAixs);
       }
-      // }
       return () => {
         window.cancelAnimationFrame(myReq);
         lineMove && lineMove.clear && lineMove.clear();

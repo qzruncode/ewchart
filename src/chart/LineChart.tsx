@@ -5,7 +5,7 @@ import { DrawBrush } from '../toolkit/level1/brush';
 import { drawClipPath } from '../toolkit/level1/clip';
 import { DrawAreaLine, DrawLine } from '../toolkit/level1/line';
 import LineMove from '../toolkit/level1/linemove';
-import { DrawPoint } from '../toolkit/point';
+import { DrawPoint } from '../toolkit/level1/point';
 
 function LineChart({ data, id, subscription, type }) {
   const svgRef = useRef(null);

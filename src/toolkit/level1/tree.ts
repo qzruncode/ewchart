@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { v4 } from 'uuid';
-import { IEWChartProps } from '../../types';
+import { IEWChartProps } from '../../../types';
 
 const linkBg = '#000';
 const iconSize = 8;
