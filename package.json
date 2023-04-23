@@ -10,7 +10,9 @@
   "keywords": [
     "d3",
     "chart",
-    "react"
+    "react",
+    "svg",
+    "canvas"
   ],
   "typings": "types/index.d.ts",
   "files": [
