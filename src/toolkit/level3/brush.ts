@@ -1,13 +1,14 @@
 import * as d3 from 'd3';
-import { IEWChartProps } from '../../types';
+import { IEWChartProps } from '../../../types';
+const scale = window.devicePixelRatio || 1;
 
 export function DrawBrush(
   this: any,
   svg,
   config,
   data: IEWChartProps['data'],
-  line: { reDraw: () => void },
-  xAixs: { func: d3.ScaleTime<number, number, never>; data: Date[]; recall: () => void },
+  line: { reCompute: () => void },
+  xAixs: { func: d3.ScaleTime<number, number, never>; data: Date[]; reCompute: (times) => void },
   yAixs: { func: d3.ScaleTime<number, number, never> }
 ) {
   const { left, right, width, height, bottom, top } = config;
@@ -27,13 +28,12 @@ export function DrawBrush(
   brushEle.call(brush);
   function brushended({ selection }) {
     if (selection) {
-      const approximateIndex = selection.map(xAixs.func.invert).map(t => d3.bisectLeft(xAixs.data, t));
+      const approximateIndex = selection.map(d => xAixs.func.invert(d * scale)).map(t => d3.bisectLeft(xAixs.data, t));
       if (approximateIndex[1] - approximateIndex[0] >= 5) {
         const approximateX = approximateIndex.map(i => xAixs.data[i]);
         config.onSelect && config.onSelect(approximateX);
-        xAixs.func.domain(approximateX);
-        line.reDraw();
-        xAixs.recall();
+        xAixs.reCompute && xAixs.reCompute(approximateX);
+        line.reCompute && line.reCompute();
       }
       brushEle.call(brush.move, null);
     }

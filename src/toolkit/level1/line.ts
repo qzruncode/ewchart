@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
-import { IEWChartProps, Igroup } from '../../types';
-import { opacityColor } from './color';
+import { IEWChartProps, Igroup } from '../../../types';
+import { opacityColor } from '../color';
 
 export function DrawLine(
   this: any,

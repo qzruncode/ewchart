@@ -9,6 +9,7 @@ import PieChart from './chart/PieChart';
 import Histogram from './chart/HistogramChart';
 import TreeChart from './chart/TreeChart';
 import CanvasLineChart from './chart/CanvasLineChart';
+import CanvasSvgLineChart from './chart/CanvasSvgLineChart';
 
 const defaultConfig = {
   height: 400,
@@ -66,6 +67,8 @@ function EWChart(props: IEWChartProps) {
       case 'scatter': {
         if (props.renderer === 'canvas') {
           return <CanvasLineChart data={props.data} id={id} subscription={subscription} type={type} />;
+        } else if (props.renderer === 'canvas+svg') {
+          return <CanvasSvgLineChart data={props.data} id={id} subscription={subscription} type={type} />;
         } else {
           return <LineChart data={props.data} id={id} subscription={subscription} type={type} />;
         }
@@ -83,7 +86,9 @@ function EWChart(props: IEWChartProps) {
   };
 
   return (
-    <div className={id + (props.className ? ` ${props.className}` : '')} style={props.style ? props.style : undefined}>
+    <div
+      className={id + (props.className ? ` ${props.className}` : '')}
+      style={Object.assign({}, { position: 'relative' }, props.style ? props.style : {})}>
       {props.data.groups && props.data.groups.length === 0 && props.data.treeData == undefined ? (
         <div className="null-box" style={{ height: props.size ? props.size.height : defaultConfig.height }}>
           暂无数据

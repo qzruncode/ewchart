@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
-import { IEWChartProps } from '../../types';
-import { getXData, showValue } from './formate';
+import { IEWChartProps } from '../../../types';
+import { getXData, showValue } from '../formate';
 
 export function DrawXAixs(this: any, svg, config, data: IEWChartProps['data']) {
   const { left, right, width, height, bottom } = config;

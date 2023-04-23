@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
-import { mouseMoves } from '..';
-import { IEWChartProps } from '../../types';
+import { mouseMoves } from '../..';
+import { IEWChartProps } from '../../../types';
 
 function DrawCross(this: any, svg, config) {
   const svgEle = d3.select(svg);

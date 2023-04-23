@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ConfigContext, mouseMoves } from '..';
 import { DrawXAixs, DrawYAixs } from '../toolkit/level2/axis';
-import { drawClipPath } from '../toolkit/level1/clip';
+import { DrawBrush } from '../toolkit/level3/brush';
 import { DrawAreaLine, DrawLine } from '../toolkit/level2/line';
-import LineMove from '../toolkit/level2/linemove';
+import LineMove from '../toolkit/level3/linemove';
 import { DrawPoint } from '../toolkit/point';
+import * as d3 from 'd3';
 
 const setCanvasSize = (canvas, width, height) => {
   const scale = window.devicePixelRatio || 1;
@@ -15,9 +16,21 @@ const setCanvasSize = (canvas, width, height) => {
 };
 
 function LineChart({ data, id, subscription, type }) {
+  const svgRef = useRef<SVGSVGElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const config = useContext(ConfigContext);
   const [chartConfig, setChartConfig] = useState(config);
+
+  const setSize = w => {
+    if (canvasRef.current) {
+      setCanvasSize(canvasRef.current, w, chartConfig.height);
+    }
+    if (svgRef.current) {
+      const svg = d3.select(svgRef.current);
+      svg.attr('width', w);
+      svg.attr('height', chartConfig.height);
+    }
+  };
 
   useEffect(() => {
     const box = document.querySelector(`.${id}`);
@@ -25,9 +38,7 @@ function LineChart({ data, id, subscription, type }) {
       const w = box ? Number(getComputedStyle(box).width.slice(0, -2)) : undefined;
       if (w !== undefined) {
         setChartConfig(Object.assign({}, chartConfig, { width: w }));
-        if (canvasRef.current) {
-          setCanvasSize(canvasRef.current, w, chartConfig.height);
-        }
+        setSize(w);
       }
     }, 1);
 
@@ -36,9 +47,7 @@ function LineChart({ data, id, subscription, type }) {
       const w = box ? Number(getComputedStyle(box).width.slice(0, -2)) : undefined;
       if (w !== undefined) {
         setChartConfig(Object.assign({}, chartConfig, { width: w }));
-        if (canvasRef.current) {
-          setCanvasSize(canvasRef.current, w, chartConfig.height);
-        }
+        setSize(w);
       }
     });
     return () => {
@@ -63,7 +72,7 @@ function LineChart({ data, id, subscription, type }) {
         // line = new DrawPoint(svgRef.current, chartConfig, data, xAixs, yAixs);
       }
       if (chartConfig.mouse) {
-        lineMove = new LineMove(canvasRef.current, canvas, chartConfig, data, xAixs, yAixs);
+        lineMove = new LineMove(svgRef.current, canvasRef.current, canvas, chartConfig, data, xAixs, yAixs);
         mouseMoves.push(lineMove);
       }
 
@@ -84,19 +93,24 @@ function LineChart({ data, id, subscription, type }) {
       };
 
       myReq = window.requestAnimationFrame(reDraw);
-      // if (chartConfig.select) {
-      //   brush = new DrawBrush(canvasRef.current, canvas, chartConfig, data, line, xAixs, yAixs);
-      // }
+      if (chartConfig.select) {
+        brush = new DrawBrush(svgRef.current, chartConfig, data, line, xAixs, yAixs);
+      }
       // }
       return () => {
         window.cancelAnimationFrame(myReq);
         lineMove && lineMove.clear && lineMove.clear();
-        // brush && brush.clear && brush.clear();
+        brush && brush.clear && brush.clear();
       };
     }
   }, [chartConfig, canvasRef.current, data]);
 
-  return <canvas ref={canvasRef} width="100%"></canvas>;
+  return (
+    <>
+      <canvas ref={canvasRef} width="100%"></canvas>
+      <svg style={{ position: 'absolute', left: 0, top: 0 }} ref={svgRef} preserveAspectRatio="xMinYMin meet"></svg>
+    </>
+  );
 }
 
 export default LineChart;

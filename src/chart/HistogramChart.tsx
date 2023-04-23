@@ -1,8 +1,8 @@
 import React from 'react';
 import { useRef, useContext, useState, useEffect } from 'react';
 import { ConfigContext } from '..';
-import { DrawXBandAixs, DrawYAixs } from '../toolkit/axis';
-import { drawClipPath } from '../toolkit/clip';
+import { DrawXBandAixs, DrawYAixs } from '../toolkit/level1/axis';
+import { drawClipPath } from '../toolkit/level1/clip';
 import { DrawHistogram } from '../toolkit/histogram';
 import HistogramMove from '../toolkit/histogrammove';
 

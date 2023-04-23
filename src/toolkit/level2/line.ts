@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
-import { IEWChartProps, Igroup } from '../../types';
-import { opacityColor } from './color';
+import { IEWChartProps, Igroup } from '../../../types';
+import { opacityColor } from '../color';
 
 const scale = window.devicePixelRatio || 1;
 
@@ -24,32 +24,37 @@ export function DrawLine(
       }
     });
 
-  const line = d3
-    .line()
-    .defined((d: any) => d != null && !isNaN(d))
-    .x((d, i) => xAixs.func(xAixs.data[i]))
-    .y((d: any) => yAixs.func(d != null && !isNaN(d) ? d : 0));
-
   const lineWidth = 1;
   const lineDash = [1 * scale, 3 * scale];
   const breakLineDash = [5 * scale, 5 * scale];
-  const breakLinePaths = breakLines.map(breakLine => {
-    const path = new Path2D(line(breakLine.values));
-    return path;
-  });
-  const linePaths = lines.map(normalLine => {
-    const I = d3.map(normalLine.values as any, (_, i) => i);
-    const D = d3.map(normalLine.values as any, (d: any, i) => d != null && !isNaN(d));
+  let breakLinePaths: any[] = [];
+  let linePaths: any[] = [];
+  const compute = () => {
     const line = d3
       .line()
-      .defined((i: any) => D[i])
-      .curve(d3.curveLinear)
-      .x((i: any) => xAixs.func(xAixs.data[i]))
-      .y((i: any) => yAixs.func(normalLine.values ? normalLine.values[i] : 0));
-    const path1 = new Path2D(line(I as any));
-    const path2 = new Path2D(line(I.filter(i => D[i]) as any));
-    return [path1, path2];
-  });
+      .defined((d: any) => d != null && !isNaN(d))
+      .x((d, i) => xAixs.func(xAixs.data[i]))
+      .y((d: any) => yAixs.func(d != null && !isNaN(d) ? d : 0));
+
+    breakLinePaths = breakLines.map(breakLine => {
+      const path = new Path2D(line(breakLine.values));
+      return path;
+    });
+    linePaths = lines.map(normalLine => {
+      const I = d3.map(normalLine.values as any, (_, i) => i);
+      const D = d3.map(normalLine.values as any, (d: any, i) => d != null && !isNaN(d));
+      const line = d3
+        .line()
+        .defined((i: any) => D[i])
+        .curve(d3.curveLinear)
+        .x((i: any) => xAixs.func(xAixs.data[i]))
+        .y((i: any) => yAixs.func(normalLine.values ? normalLine.values[i] : 0));
+      const path1 = new Path2D(line(I as any));
+      const path2 = new Path2D(line(I.filter(i => D[i]) as any));
+      return [path1, path2];
+    });
+  };
+  compute();
 
   const draw = () => {
     context.save();
@@ -97,6 +102,7 @@ export function DrawLine(
     context.restore();
   };
 
+  this.reCompute = compute;
   this.draw = draw;
 }
 
@@ -120,56 +126,60 @@ export function DrawAreaLine(
       }
     });
 
-  const line = d3
-    .line()
-    .defined((d: any) => d != null && !isNaN(d))
-    .x((d, i) => xAixs.func(xAixs.data[i]))
-    .y((d: any) => yAixs.func(d != null && !isNaN(d) ? d : 0));
-  const area = d3
-    .area()
-    .defined((d: any) => d != null && !isNaN(d))
-    .curve(d3.curveLinear)
-    .x((d, i) => xAixs.func(xAixs.data[i]))
-    .y0(yAixs.func(data.y ? data.y.start : 0))
-    .y1((d: any) => yAixs.func(d != null && !isNaN(d) ? d : 0));
-
   const lineWidth = 1.5;
   const lineDash = [1 * scale, 3 * scale];
   const breakLineDash = [5 * scale, 5 * scale];
 
-  const breakLinePaths = breakLines.map(breakLine => {
-    const path = new Path2D(line(breakLine.values));
-    return path;
-  });
-  const breakLineAreaPaths = breakLines.map(breakLine => {
-    const path = new Path2D(area(breakLine.values));
-    return path;
-  });
-
-  const linePaths = lines.map(normalLine => {
-    const I = d3.map(normalLine.values as any, (_, i) => i);
-    const D = d3.map(normalLine.values as any, (d: any, i) => d != null && !isNaN(d));
+  let breakLinePaths, breakLineAreaPaths, linePaths;
+  const compute = () => {
     const line = d3
       .line()
-      .defined((i: any) => D[i])
-      .curve(d3.curveLinear)
-      .x((i: any) => xAixs.func(xAixs.data[i]))
-      .y((i: any) => yAixs.func(normalLine.values ? normalLine.values[i] : 0));
-    const path1 = new Path2D(line(I as any));
-    const path2 = new Path2D(line(I.filter(i => D[i]) as any));
-
+      .defined((d: any) => d != null && !isNaN(d))
+      .x((d, i) => xAixs.func(xAixs.data[i]))
+      .y((d: any) => yAixs.func(d != null && !isNaN(d) ? d : 0));
     const area = d3
       .area()
-      .defined((i: any) => D[i])
+      .defined((d: any) => d != null && !isNaN(d))
       .curve(d3.curveLinear)
-      .x((i: any) => xAixs.func(xAixs.data[i]))
+      .x((d, i) => xAixs.func(xAixs.data[i]))
       .y0(yAixs.func(data.y ? data.y.start : 0))
-      .y1((i: any) => yAixs.func(normalLine.values ? normalLine.values[i] : 0));
+      .y1((d: any) => yAixs.func(d != null && !isNaN(d) ? d : 0));
 
-    const path3 = new Path2D(area(I as any));
-    const path4 = new Path2D(area(I.filter(i => D[i]) as any));
-    return [path1, path2, path3, path4];
-  });
+    breakLinePaths = breakLines.map(breakLine => {
+      const path = new Path2D(line(breakLine.values));
+      return path;
+    });
+    breakLineAreaPaths = breakLines.map(breakLine => {
+      const path = new Path2D(area(breakLine.values));
+      return path;
+    });
+
+    linePaths = lines.map(normalLine => {
+      const I = d3.map(normalLine.values as any, (_, i) => i);
+      const D = d3.map(normalLine.values as any, (d: any, i) => d != null && !isNaN(d));
+      const line = d3
+        .line()
+        .defined((i: any) => D[i])
+        .curve(d3.curveLinear)
+        .x((i: any) => xAixs.func(xAixs.data[i]))
+        .y((i: any) => yAixs.func(normalLine.values ? normalLine.values[i] : 0));
+      const path1 = new Path2D(line(I as any));
+      const path2 = new Path2D(line(I.filter(i => D[i]) as any));
+
+      const area = d3
+        .area()
+        .defined((i: any) => D[i])
+        .curve(d3.curveLinear)
+        .x((i: any) => xAixs.func(xAixs.data[i]))
+        .y0(yAixs.func(data.y ? data.y.start : 0))
+        .y1((i: any) => yAixs.func(normalLine.values ? normalLine.values[i] : 0));
+
+      const path3 = new Path2D(area(I as any));
+      const path4 = new Path2D(area(I.filter(i => D[i]) as any));
+      return [path1, path2, path3, path4];
+    });
+  };
+  compute();
 
   const draw = () => {
     context.save();
@@ -223,5 +233,6 @@ export function DrawAreaLine(
     context.restore();
   };
 
+  this.reCompute = compute;
   this.draw = draw;
 }

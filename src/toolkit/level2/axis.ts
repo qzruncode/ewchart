@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
-import { IEWChartProps } from '../../types';
-import { getXData, showValue } from './formate';
+import { IEWChartProps } from '../../../types';
+import { getXData, showValue } from '../formate';
 
 const scale = window.devicePixelRatio || 1;
 
@@ -13,17 +13,20 @@ export function DrawXAixs(this: any, canvas, config, data: IEWChartProps['data']
   bottom = scale * bottom;
   const { start, end, interval } = data.x as any;
   const xData = getXData(start, end, interval);
+  const ticksLen = xData.length < 10 ? 5 : 10;
   const context = canvas.getContext('2d');
   const minX = left,
     maxX = width - right,
     tickSize = 6 * scale;
   const func = d3
-    .scaleUtc()
+    .scaleTime()
     .domain([new Date(start), new Date(end)])
     .range([minX, maxX]);
-  const ticksLen = xData.length < 10 ? 5 : 10;
-  const allTicks = func.ticks(ticksLen);
-  const format = func.tickFormat(ticksLen, '%H:%M:%S');
+  const allTicks = func.ticks(ticksLen),
+    format = func.tickFormat(ticksLen, '%H:%M:%S');
+  const compute = extent => {
+    func.domain(extent);
+  };
 
   const draw = () => {
     context.save();
@@ -54,6 +57,7 @@ export function DrawXAixs(this: any, canvas, config, data: IEWChartProps['data']
 
   this.func = func;
   this.data = xData;
+  this.reCompute = compute;
   this.draw = draw;
 }
 

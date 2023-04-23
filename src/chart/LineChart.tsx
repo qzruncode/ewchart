@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ConfigContext, mouseMoves } from '..';
-import { DrawXAixs, DrawYAixs } from '../toolkit/axis';
-import { DrawBrush } from '../toolkit/brush';
-import { drawClipPath } from '../toolkit/clip';
-import { DrawAreaLine, DrawLine } from '../toolkit/line';
-import LineMove from '../toolkit/linemove';
+import { DrawXAixs, DrawYAixs } from '../toolkit/level1/axis';
+import { DrawBrush } from '../toolkit/level1/brush';
+import { drawClipPath } from '../toolkit/level1/clip';
+import { DrawAreaLine, DrawLine } from '../toolkit/level1/line';
+import LineMove from '../toolkit/level1/linemove';
 import { DrawPoint } from '../toolkit/point';
 
 function LineChart({ data, id, subscription, type }) {

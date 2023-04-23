@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
-import { IEWChartProps } from '../../types';
-import { mouseMoves } from '..';
+import { IEWChartProps } from '../../../types';
+import { mouseMoves } from '../..';
 const scale = window.devicePixelRatio || 1;
 
 export default function LineMove(
