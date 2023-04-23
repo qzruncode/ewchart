@@ -13,7 +13,7 @@
 
 ## 使用方式
 
-+ 文档地址+示例 [readme](https://qzruncode.github.io/ewchart-base-template/build/readme)
++ 文档地址+示例 [readme](https://qzruncode.github.io/ewchart-base-template/build)
 + demo源码 [ewchart-base-template](https://www.npmjs.com/package/ewchart-base-template)
 
 ## demo图
