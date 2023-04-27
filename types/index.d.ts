@@ -62,7 +62,7 @@ export interface IEWChartProps {
       data: Array<{ color?: string; label: string; value: number | null; x?: number; y?: number }>,
       position: { x: number; y: number }
     ) => void;
-    onSelect?: (dateRange: Date[]) => void;
+    onSelect?: (rangeIndexs: number[], dateRange: Date[]) => void;
     onClick?: (data: any) => void;
   };
   interactive?: {

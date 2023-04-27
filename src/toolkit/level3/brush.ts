@@ -31,9 +31,7 @@ export function DrawBrush(
       const approximateIndex = selection.map(d => xAixs.func.invert(d * scale)).map(t => d3.bisectLeft(xAixs.data, t));
       if (approximateIndex[1] - approximateIndex[0] >= 5) {
         const approximateX = approximateIndex.map(i => xAixs.data[i]);
-        config.onSelect && config.onSelect(approximateX);
-        xAixs.reCompute && xAixs.reCompute(approximateX);
-        line.reCompute && line.reCompute();
+        config.onSelect && config.onSelect(approximateIndex, approximateX);
       }
       brushEle.call(brush.move, null);
     }
