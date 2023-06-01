@@ -1,6 +1,6 @@
 {
   "name": "ewchart",
-  "version": "2.1.1-beta.1",
+  "version": "2.2.0",
   "description": "chart for 2d",
   "main": "build/index",
   "author": {
