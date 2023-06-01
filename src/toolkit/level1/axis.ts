@@ -12,25 +12,26 @@ export function DrawXAixs(this: any, svg, config, data: IEWChartProps['data']) {
   if (xEle.empty()) {
     xEle = svgEle.append('g').attr('class', 'x_axis');
   }
+  const formatStr = data.x?.format ? data.x?.format : '%H:%M:%S';
 
   const func = d3
     .scaleUtc()
     .domain([new Date(start), new Date(end)])
     .range([left, width - right]);
-  const axis = g =>
+  const axis = (g, func) =>
     g.attr('transform', `translate(0,${height - bottom})`).call(
       d3
         .axisBottom(func)
         .ticks(xData.length < 10 ? 5 : 10)
         .tickSizeOuter(0)
-        .tickFormat(d3.timeFormat('%H:%M:%S') as any)
+        .tickFormat(d3.timeFormat(formatStr) as any)
     );
-  xEle.call(axis);
+  xEle.call(axis, func);
 
   this.func = func;
   this.data = xData;
-  this.recall = () => {
-    xEle.call(axis);
+  this.recall = newFunc => {
+    newFunc ? xEle.call(axis, newFunc) : xEle.call(axis, func);
   };
 }
 
@@ -48,7 +49,7 @@ export function DrawYAixs(this: any, svg, config, data: IEWChartProps['data']) {
     .domain([start, end])
     .range([height - bottom, top]);
 
-  const axis = g =>
+  const axis = (g, func) =>
     g
       .attr('transform', `translate(${left},0)`)
       .call(
@@ -63,9 +64,12 @@ export function DrawYAixs(this: any, svg, config, data: IEWChartProps['data']) {
       )
       .call(g => g.selectAll('.tick text').attr('x', -30).attr('dy', -4));
 
-  yEle.call(axis);
+  yEle.call(axis, func);
 
   this.func = func;
+  this.recall = newFunc => {
+    newFunc ? yEle.call(axis, newFunc) : yEle.call(axis, func);
+  };
 }
 
 export function DrawXBandAixs(this: any, svg, config, data: IEWChartProps['data']) {

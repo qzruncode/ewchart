@@ -7,7 +7,7 @@ export interface Igroup {
   label: string;
   break?: 'line' | 'none';
   breakType?: 'dotted' | 'solid';
-  values?: Array<number | null>;
+  values?: Array<number | null> | Array<{ Open: number; High: number; Low: number; Close: number }>;
   value?: number;
   choose?: boolean;
 }
@@ -17,6 +17,7 @@ export interface EWChartData {
     start: number;
     end: number;
     interval: number;
+    format?: string;
   };
   y?: {
     start: number;
@@ -44,7 +45,7 @@ export interface EWChartTreeData {
 }
 
 export interface IEWChartProps {
-  type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'tree';
+  type: 'line' | 'arealine' | 'pie' | 'histogram' | 'scatter' | 'tree' | 'candlestick';
   renderer: 'canvas' | 'svg' | 'canvas+svg';
   style?: { [name: string]: any };
   className?: string;

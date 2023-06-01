@@ -95,6 +95,7 @@ function DrawCircle(this: any, svg, config, moveCross, yAixs, data: IEWChartProp
 export default function LineMove(
   this: any,
   svg,
+  chartType,
   config,
   data: IEWChartProps['data'],
   xAixs: { func: d3.ScaleTime<number, number, never>; data: Date[] },
@@ -136,8 +137,18 @@ export default function LineMove(
       cross = new DrawCross(svg, config);
     }
     const moveCross = new MoveCross(cross, config, position, xAixs, yAixs);
-    drawCircle = new DrawCircle(svg, config, moveCross, yAixs, data);
-    config.onMove && config.onMove('move', drawCircle.points, { x: position[0], y: position[1] });
+
+    if (chartType === 'candlestick') {
+      const d =
+        data.groups && data.groups[0] && data.groups[0].values ? data.groups[0].values[moveCross.xIndex] : undefined;
+      const t = xAixs.data[moveCross.xIndex];
+      d !== undefined &&
+        config.onMove &&
+        config.onMove('move', Object.assign({}, { time: t }, d), { x: position[0], y: position[1] });
+    } else {
+      drawCircle = new DrawCircle(svg, config, moveCross, yAixs, data);
+      config.onMove && config.onMove('move', drawCircle.points, { x: position[0], y: position[1] });
+    }
   }
 
   function leaved(event, passive) {
@@ -150,7 +161,7 @@ export default function LineMove(
         });
     cross.xcrossEle.remove();
     cross.ycrossEle.remove();
-    drawCircle.circles.remove();
+    chartType !== 'candlestick' && drawCircle.circles.remove();
     config.onMove && config.onMove('leave');
   }
 

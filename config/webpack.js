@@ -29,7 +29,6 @@ const config = {
         test: /\.l?[ec]ss$/i,
         sideEffects: true,
         use: [
-          'style-loader',
           {
             loader: require.resolve('css-loader'),
             options: {
@@ -117,6 +116,6 @@ const config = {
       },
     ],
   },
-  externals: [nodeExternals({ allowlist: 'd3' })],
+  externals: [nodeExternals()],
 };
 module.exports = config;

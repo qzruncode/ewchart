@@ -6,6 +6,7 @@ import { drawClipPath } from '../toolkit/level1/clip';
 import { DrawAreaLine, DrawLine } from '../toolkit/level1/line';
 import LineMove from '../toolkit/level1/linemove';
 import { DrawPoint } from '../toolkit/level1/point';
+import { DrawCandlestick } from '../toolkit/level1/candlestick';
 
 function LineChart({ data, id, subscription, type }) {
   const svgRef = useRef(null);
@@ -46,10 +47,12 @@ function LineChart({ data, id, subscription, type }) {
         line = new DrawLine(svgRef.current, chartConfig, data, xAixs, yAixs);
       } else if (type === 'scatter') {
         line = new DrawPoint(svgRef.current, chartConfig, data, xAixs, yAixs);
+      } else if (type === 'candlestick') {
+        line = new DrawCandlestick(svgRef.current, chartConfig, data, xAixs, yAixs);
       }
       drawClipPath(svgRef.current, chartConfig);
       if (chartConfig.mouse) {
-        lineMove = new LineMove(svgRef.current, chartConfig, data, xAixs, yAixs);
+        lineMove = new LineMove(svgRef.current, type, chartConfig, data, xAixs, yAixs);
         mouseMoves.push(lineMove);
       }
       if (chartConfig.select) {

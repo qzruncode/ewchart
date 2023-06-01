@@ -64,7 +64,8 @@ function EWChart(props: IEWChartProps) {
     switch (type) {
       case 'line':
       case 'arealine':
-      case 'scatter': {
+      case 'scatter':
+      case 'candlestick': {
         if (props.renderer === 'canvas') {
           return <CanvasLineChart data={props.data} id={id} subscription={subscription} type={type} />;
         } else if (props.renderer === 'canvas+svg') {

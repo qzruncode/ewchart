@@ -22,7 +22,6 @@ export function DrawPoint(
       .selectAll('g')
       .data(data.groups)
       .join('g')
-      .attr(data.pointType === 'fill' ? 'stroke' : 'fill', 'none')
       .attr(data.pointType === 'stroke' ? 'stroke' : 'fill', d => d.color)
       .selectAll('circle')
       .data(d => d.values)
