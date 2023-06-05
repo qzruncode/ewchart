@@ -1,13 +1,20 @@
 import * as d3 from 'd3';
 import { IEWChartProps } from '../../../types';
 
+interface IAixs {
+  originFunc: d3.ScaleTime<number, number, never>;
+  func: d3.ScaleTime<number, number, never>;
+  data: Date[];
+  recall: (func) => void;
+}
+
 export function DrawCandlestick(
   this: any,
   svg,
   config,
   data: IEWChartProps['data'],
-  xAixs: { func: d3.ScaleTime<number, number, never>; data: Date[]; recall: (func) => void },
-  yAixs: { func: d3.ScaleTime<number, number, never>; recall: (func) => void }
+  xAixs: IAixs,
+  yAixs: Omit<IAixs, 'data'>
 ) {
   const svgEle = d3.select(svg);
 
@@ -73,8 +80,8 @@ export function DrawCandlestick(
         [width - right, height - bottom],
       ])
       .on('zoom', ({ transform }) => {
-        const zx = transform.rescaleX(xAixs.func).interpolate(d3.interpolateRound);
-        const zy = transform.rescaleY(yAixs.func).interpolate(d3.interpolateRound);
+        const zx = transform.rescaleX(xAixs.originFunc).interpolate(d3.interpolateRound);
+        const zy = transform.rescaleY(yAixs.originFunc).interpolate(d3.interpolateRound);
         sticksBox.attr('transform', transform);
         xAixs.recall(zx);
         yAixs.recall(zy);

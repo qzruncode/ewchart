@@ -28,10 +28,17 @@ export function DrawXAixs(this: any, svg, config, data: IEWChartProps['data']) {
     );
   xEle.call(axis, func);
 
+  this.originFunc = func;
   this.func = func;
   this.data = xData;
   this.recall = newFunc => {
-    newFunc ? xEle.call(axis, newFunc) : xEle.call(axis, func);
+    if (newFunc) {
+      xEle.call(axis, newFunc);
+      this.func = newFunc;
+    } else {
+      xEle.call(axis, func);
+      this.func = func;
+    }
   };
 }
 
@@ -67,8 +74,15 @@ export function DrawYAixs(this: any, svg, config, data: IEWChartProps['data']) {
   yEle.call(axis, func);
 
   this.func = func;
+  this.originFunc = func;
   this.recall = newFunc => {
-    newFunc ? yEle.call(axis, newFunc) : yEle.call(axis, func);
+    if (newFunc) {
+      yEle.call(axis, newFunc);
+      this.func = newFunc;
+    } else {
+      yEle.call(axis, func);
+      this.func = func;
+    }
   };
 }
 
